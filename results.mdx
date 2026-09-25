@@ -1,0 +1,84 @@
+---
+title: "Results, logs, and usage"
+description: "Distinguish execution state, test verdicts, evidence, and accounting."
+---
+
+A submitted test is represented by a parent **run** with one child result per
+selected device. The current resource and Python namespace are `/v1/runs` and
+`client.runs`.
+
+## Wait for completion
+
+Call `GET /v1/runs/{run_id}` or `client.runs.get(run_id)` to inspect the current run.
+`client.runs.wait(run_id)` polls until execution completes.
+
+| Field | Meaning |
+| --- | --- |
+| `status` | Parent lifecycle: `queued`, `running`, or `complete` |
+| `outcome` | Aggregate verdict, initially null |
+| `progress.total` | Number of selected device tests |
+| `progress.completed` | Number in a terminal state, including errors and cancellations |
+| `results` | Per-device execution results |
+| `cancel_requested` | Whether cooperative cancellation was requested |
+| `run_url` | Dashboard page for the run |
+| `project_id`, `project_name` | Project selected by the API key |
+| `start_url`, `instructions`, `files` | Submitted inputs; instructions are stored after trimming surrounding whitespace |
+| `usage`, `billing` | Recorded accounting information, when available |
+
+A parent with `status: "complete"` has finished; inspect `outcome` to decide what
+happened. Outcomes are `passed`, `failed`, `inconclusive`, `error`, or `cancelled`.
+For mixed device results, the aggregate uses this precedence: `error`, `failed`,
+`cancelled`, `inconclusive`, then `passed`.
+
+Each child has an `id` beginning with `test_`, device information, a `phase`, and a
+`status`. The child's `status` combines lifecycle and verdict: `queued`, `running`,
+`passed`, `failed`, `inconclusive`, `error`, or `cancelled`. Children do not have a
+separate `outcome` field. `noul` is an agent assessment score, not a substitute for
+the child's status or evidence checks.
+
+`inconclusive` means sufficient evidence was not established. `error` indicates
+execution or preparation could not complete. Inspect `error`, `error_code`,
+`conditions`, `condition_receipts`, and `checks` when present. Use `run_url` and each child's `session_url` for dashboard
+evidence; sign-in to the owning account is required.
+
+## Read logs
+
+```python
+page = client.runs.logs(run_id, limit=200)
+for event in page["logs"]:
+    print(event["time"], event["test_id"], event["phase"], event["message"])
+
+if page["next_cursor"] is not None:
+    page = client.runs.logs(run_id, cursor=page["next_cursor"], limit=200)
+```
+
+Use a child result's `id` as `test_id` to filter one device. `limit` accepts 1–500
+and defaults to 200. Pass cursors back unchanged. Filtering happens after a page
+is read, so an empty filtered page can still have `next_cursor`.
+
+`next_cursor: null` means you have caught up with existing logs. Runs also
+return `cursor`, a watermark you can send later to fetch newly appended events.
+A parent lifecycle event has
+`test_id: null`.
+
+## Cancel and clean up
+
+Call `POST /v1/runs/{run_id}/cancel` or `client.runs.cancel(run_id)` to request
+cancellation. Continue polling: running devices must finish cleanup before the
+parent becomes complete. Cancelling an already completed run returns it unchanged.
+Closing the SDK or reaching its local wait timeout does not cancel remote work.
+
+## Read usage
+
+`GET /v1/runs/{run_id}/usage` returns the same run representation as the ordinary
+get endpoint, with aggregate `usage` and `results[].usage`. The SDK has no separate
+usage method; read these fields from `client.runs.get(run_id)`.
+
+`bedrock` and `jev` contain input, output, total, cache-read, cache-write, request,
+and unreported-request counters. `device_farm` contains `duration_seconds`,
+`billed_minutes`, `sessions`, and `unconfirmed_sessions`.
+
+`usage.complete` describes whether provider accounting is confirmed. It is
+independent of execution completion, so counters can remain incomplete after a
+test ends. Null usage means no recorded snapshot is available. Billing can settle
+later and includes credit seconds used when applicable.

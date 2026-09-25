@@ -1,0 +1,87 @@
+---
+title: "Network, language, and timezone"
+description: "Describe browser conditions in instructions and inspect their verification evidence."
+---
+
+Specify supported conditions in ordinary `instructions`:
+
+```python
+run = client.runs.create(
+    start_url="https://example.com",
+    instructions="Using a 3G connection, verify that the page heading is Example Domain.",
+    platforms=["windows"],
+)
+```
+
+The HTTP request and SDK have no `network`, `locale`, `timezone`, or `conditions`
+arguments. The worker reads your instructions, resolves conditions before allocating
+a browser, and applies them before the first site navigation. A condition applies
+throughout the test unless you request a change, which is currently unsupported.
+
+A `202` submission means the run was accepted for preparation. Unsupported or
+ambiguous conditions can produce a device error afterward, before any browser is
+allocated. Inspect the final [results and evidence](/results).
+
+## Network simulation
+
+Windows Chrome supports three BrowserBunny presets, version `2026-09-25.1`:
+
+| Preset | Download cap (kbps) | Upload cap (kbps) | Minimum response latency (ms) |
+| --- | ---: | ---: | ---: |
+| `3g` | 750 | 250 | 300 |
+| `slow` | 400 | 150 | 400 |
+| `fast` | 1600 | 750 | 150 |
+
+Rates are decimal kilobits per second. Minimum response latency means time from
+request sent to response headers received; it is not target RTT or delay in each
+direction. You can also state exact rates with units and an explicit minimum
+response latency in your instructions.
+
+These presets simulate browser traffic. They are not real cellular connections
+or AWS curated network profiles. Readback verifies applied configuration; it does
+not measure achieved throughput or RTT. Server-side file downloads are separate
+from the browser's outgoing upload.
+
+## Language and timezone
+
+Use a language tag or an IANA timezone identifier, for example:
+
+- “Set the browser locale to es-ES and verify the page heading.”
+- “Check that the website language is localized for users in Spain.”
+- “Use the Europe/Madrid browser timezone and verify the page loads.”
+
+A language-focused Spain request uses `es-ES` and records that assumption. Browser
+language preferences and Intl locale are verified; automatic browser translation
+is disabled. A request to check the website's language adds a separate AI-assisted
+check of sampled rendered text. Setting the locale alone does not prove that a
+site localized itself or received a particular `Accept-Language` header.
+
+Timezone emulation is read back through Intl. Language, timezone, GPS, and network
+origin are independent. None implies the others.
+
+## Discover and verify support
+
+Read each device's `capabilities.conditions`. `implemented` describes adapter
+support; `enabled` describes the current deployment. Production enables network,
+locale, and timezone on Desktop Chrome. Per-session readback is still required.
+
+The result includes:
+
+- `conditions`: resolved requirements and any assumptions or preparation error.
+- `condition_receipts`: applied values, timestamps, evidence, and a status of
+  `verified`, `unverified`, or `error`.
+- `checks`: separate website checks, when requested.
+
+If conditions cannot be verified, execution stops with
+`error_code: "condition_verification_failed"`. A verified setup does not itself
+establish a passed website test.
+
+## Current boundaries
+
+GPS, geographic IP routing, geofencing comparisons, staged network changes,
+offline mode, HTTP jitter, and packet loss are unavailable. The catalog's `lossy`
+preset is explicitly disabled. Exact RTT, one-way delay, regional pricing, and
+regional date or currency-format assertions are also unsupported.
+
+Explicit desktop viewport resizing is a separate scoped browser action, not a
+physical device simulation. Describe the size in instructions when needed.

@@ -1,0 +1,65 @@
+---
+title: "Upload files from URLs"
+description: "Provide file sources separately and describe the upload in ordinary language."
+---
+
+Pass `files` as a list of public HTTPS URLs, then describe which file to upload and
+where. No alias or `@` syntax is required.
+
+```python
+run = client.runs.create(
+    start_url="https://example.com/upload",
+    instructions="Upload the invoice PDF into Attachment, click Upload, and verify acceptance.",
+    files=["https://files.example.com/invoice.pdf"],
+    platforms=["windows"],
+)
+```
+
+The same HTTP request body is:
+
+```json
+{
+  "start_url": "https://example.com/upload",
+  "instructions": "Upload the invoice PDF into Attachment, click Upload, and verify acceptance.",
+  "files": ["https://files.example.com/invoice.pdf"],
+  "devices": ["desktop-chrome"]
+}
+```
+
+Replace the example URLs with your test page and downloadable fixture. Supplying
+a URL does not automatically upload it: your instructions authorize the upload,
+and the agent selects the source for an observed webpage file input. File contents
+are not interpreted as documents. Desktop Chrome is the supported target.
+
+## File requirements
+
+Each URL must be public HTTPS and at most 2,000 characters. Credentials, private
+addresses, raw whitespace, controls, backslashes, quote delimiters, and angle
+brackets are rejected. Percent-encoded values remain unchanged.
+
+The file list has no separate count limit. Downloads are limited to **10 MiB per
+file**, **30 seconds**, and **three redirects**. Every connection must resolve to
+public addresses. Use a URL that stays accessible until the agent reaches the
+upload step; no browser cookies or custom download authorization are supplied.
+Downloads happen during execution, not when you submit the run. Temporary files
+are removed after transfer or failure.
+
+The SDK preserves exact URL strings and list order. The run response returns the
+original list to authenticated callers; execution reports and logs redact source
+URLs. Changing the list or its order changes idempotency matching. An omitted,
+null, or empty list means no separately supplied sources.
+
+An exact quoted URL in instructions also remains supported, such as
+`Upload "https://files.example.com/invoice.pdf" into Attachment`.
+The separate `files` field keeps URLs out of the 3,000-character instructions budget.
+
+## What passing an upload means
+
+The agent first verifies selection in the file input. For a requested submitted
+upload, it separately checks fresh rendered evidence of application acceptance.
+A click, populated input, or upload progress alone cannot pass that check. A shown
+rejection fails; missing or changing evidence is inconclusive.
+
+An explicit file-selection-only request does not require submission. Application
+acceptance is evidence of the displayed result, not proof of server persistence.
+You can combine uploads with the supported [network conditions](/conditions).

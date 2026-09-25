@@ -4,7 +4,7 @@ sidebarTitle: "Quickstart"
 description: "Connect to BrowserBunny and submit a browser test."
 ---
 
-You need a BrowserBunny account, an API key, and an available test target.
+You need a BrowserBunny account, a project API key, available test minutes, and an enabled test target.
 Manage your keys in the [dashboard](https://dash.browserbunny.dev).
 
 ## Connect to the API
@@ -28,8 +28,8 @@ Choose a device from the response whose `enabled` value is `true` and whose
 
 ## Submit a test
 
-Replace `DEVICE_ID` with your chosen device ID and set `start_url` to a site you
-are authorized to test. Describe the task in `test_task`.
+Windows Chrome (`desktop-chrome`) is currently enabled. Set `start_url` to your
+public HTTPS test site and describe what to do and verify in `instructions`.
 
 ```bash
 curl --fail-with-body https://api.browserbunny.dev/v1/runs \
@@ -38,13 +38,15 @@ curl --fail-with-body https://api.browserbunny.dev/v1/runs \
   -H "Idempotency-Key: first-homepage-test-001" \
   --data '{
     "start_url": "https://example.com",
-    "test_task": "Verify that the homepage loads and has a page title.",
-    "devices": ["DEVICE_ID"]
+    "instructions": "Verify that the homepage loads and has a page title.",
+    "devices": ["desktop-chrome"]
   }'
 ```
 
 A new run returns HTTP `202`. Save the `id` from the response to retrieve its
-progress. Creating a run starts test execution and can consume account usage.
+progress. An identical idempotent replay returns `200`. Creating a run starts
+preparation and can consume account usage. Worker preparation can reject unsupported
+instructions before a browser is allocated.
 
 <Note>
   Keep the same idempotency key and request body when retrying an uncertain
@@ -72,5 +74,10 @@ curl --fail-with-body 'https://api.browserbunny.dev/v1/runs/RUN_ID/logs?limit=20
   -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
-If the response includes `next_cursor`, pass that value unchanged as the `cursor`
-query parameter to retrieve the next page.
+If `next_cursor` is non-null, pass that value unchanged as the `cursor` query
+parameter to retrieve the next page. Current runs also return a `cursor` watermark
+for polling future events. See [results and logs](/results).
+
+Next, try the [Python SDK](/python-sdk), [upload a file](/files), or describe
+[network and locale conditions](/conditions). The [API reference](/api-reference/create-run)
+lists every supported request field and response.

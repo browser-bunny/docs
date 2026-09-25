@@ -1,0 +1,73 @@
+---
+title: "Choose a test environment"
+description: "Discover enabled targets and distinguish SDK selectors from HTTP fields."
+---
+
+**Windows Chrome is the currently enabled execution environment.** Browsers start
+on demand in AWS Device Farm TestGrid and are released after execution. macOS is
+not supported. The catalog also lists mobile devices, Edge, and Firefox, but these
+targets are locked and cannot currently run tests.
+
+Fetch `GET /v1/devices` or call `client.devices.list()`. Select entries with
+`enabled: true` and `locked: false`.
+
+| Catalog field | Meaning |
+| --- | --- |
+| `id` | Exact configuration ID accepted by HTTP `devices`, such as `desktop-chrome` |
+| `kind` | `desktop` or `mobile` |
+| `platform` | OS family, such as `WINDOWS`, `IOS`, or `ANDROID` |
+| `os` | `Windows` for desktop; an OS version for a mobile configuration |
+| `browser` | Desktop browser name, when present |
+| `model_id` | Mobile model selector used by the Python SDK, when present |
+| `availability` | Catalog snapshot availability or `ON_DEMAND`; not a reservation |
+| `locked` | Whether execution is unavailable for this configuration |
+| `enabled` | Whether this unlocked configuration is enabled for your account |
+| `capabilities.conditions` | Implemented and enabled browser conditions, presets, and unavailable reasons |
+
+`checked_at` is the catalog snapshot's refresh time. It is not a live inventory
+lookup. `payments_enabled` describes this deployment's billing setting, and
+`price_per_minute` is catalog metadata rather than your settled charge.
+
+## HTTP selection
+
+Pass exact IDs in the create request:
+
+```json
+{
+  "start_url": "https://example.com",
+  "instructions": "Verify the page heading.",
+  "devices": ["desktop-chrome"]
+}
+```
+
+Omit `devices`, or pass `"all"`, to use your account's enabled configurations.
+Explicit lists must be nonempty and contain distinct enabled IDs. Requests above
+eight targets are rejected without truncation. This is a BrowserBunny limit.
+
+## Python selection
+
+Use OS names for a convenient default:
+
+```python
+result = client.run(
+    start_url="https://example.com",
+    instructions="Verify the page heading.",
+    platforms=["windows"],
+)
+```
+
+The equivalent explicit Windows selector is
+`platforms=[{"os": "windows", "browsers": ["chrome"]}]`.
+The SDK resolves `platforms` to exact IDs before calling the HTTP API.
+`platforms` is not an HTTP request field. `runs.create()` accepts either
+`platforms` or `devices`; passing both is an error. Omitting both uses the account’s enabled configurations.
+
+The SDK also understands `ios` and `android` selectors, with optional mobile
+`device` model IDs and `os_version` filters. These selectors currently fail because
+mobile execution is locked. A mobile version filter accepts `latest` (the default,
+newest snapshot version per model), an exact numeric version, a list of versions,
+a range such as `>=18,<19`, or `all`. It never invents a configuration or silently
+falls back from a locked match.
+
+Windows has no physical-device or OS-version selector. TestGrid chooses
+the browser version. Discover the actual browser in the execution result.

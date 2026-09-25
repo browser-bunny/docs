@@ -1,0 +1,7 @@
+{
+  "api_version": "1.0.0",
+  "sdk_version": "0.6.0",
+  "backend_bundle_sha256": "756c3ac3af5d6aa376ce7f0e8da5273e0e55bcff20a02f194874dde1d1a590a9",
+  "openapi_sha256": "b244fe24d07314b5a006e9638f53259ffa1e0cb4e5c4b5101c0443e4e24a69df",
+  "contract_url": "https://api.browserbunny.dev/openapi/public-v1.json"
+}

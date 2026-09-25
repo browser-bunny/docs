@@ -9,12 +9,50 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "groups": [
+    "tabs": [
       {
-        "group": "Get started",
-        "pages": [
-          "index",
-          "quickstart"
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "index",
+              "quickstart",
+              "authentication",
+              "python-sdk"
+            ]
+          },
+          {
+            "group": "Write and follow tests",
+            "pages": [
+              "devices",
+              "conditions",
+              "files",
+              "results",
+              "errors-and-limits"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "groups": [
+          {
+            "group": "Devices",
+            "pages": [
+              "api-reference/list-devices"
+            ]
+          },
+          {
+            "group": "Runs",
+            "pages": [
+              "api-reference/create-run",
+              "api-reference/get-run",
+              "api-reference/cancel-run",
+              "api-reference/get-run-logs",
+              "api-reference/get-run-usage"
+            ]
+          }
         ]
       }
     ]
