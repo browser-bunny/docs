@@ -1,20 +1,39 @@
 ---
-title: "Introduction"
-description: "Welcome to your project"
+title: "Browser tests, in your words."
+sidebarTitle: "Introduction"
+description: "Describe a user journey. Run it with BrowserBunny. Understand what happened."
 ---
 
-Write a short description of your product here. What it does, who it's for, and what they can accomplish with it.
+<div className="bb-kicker">BROWSERBUNNY DOCUMENTATION</div>
 
-<Tip>
-  Ready to make this your own? Start by editing this page. Update your `docs.json` file to customize your site. Then fill out the [Quickstart](/quickstart) page.
-</Tip>
+<p className="bb-intro">
+  Give BrowserBunny a URL and a task in plain language. Start a browser test
+  through the API or Python SDK, follow its progress, and review the evidence
+  from your dashboard.
+</p>
 
-<Card title="Quickstart" icon="rocket" href="/quickstart">
-  This card links to the quickstart page in your project.
-</Card>
-<Card title="Components" icon="puzzle-piece" href="https://mintlify.com/docs/components">
-  Add cards, callouts, steps, tabs, and more to design and structure your pages.
-</Card>
-<Card title="Settings" icon="gear" href="https://mintlify.com/docs/organize/settings">
-  Set your site name, branding, and navigation in the `docs.json` file.
-</Card>
+<CardGroup cols={2}>
+  <Card title="Make your first API request" icon="terminal" href="/quickstart" className="bb-card">
+    Connect with an API key, choose an available device, and submit a test.
+  </Card>
+  <Card title="Explore your dashboard" icon="monitor-play" href="https://dash.browserbunny.dev" className="bb-card">
+    Manage API keys and review your runs, activity, and session recordings.
+  </Card>
+</CardGroup>
+
+## From a task to a result
+
+<Steps>
+  <Step title="Describe the journey">
+    Choose a starting URL and explain what you want to check. Use the same
+    language you would use to walk a teammate through the experience.
+  </Step>
+  <Step title="Choose where to run">
+    Retrieve the device catalog and select a target enabled for your account.
+    Availability comes from the API, so your request uses supported targets.
+  </Step>
+  <Step title="Review the evidence">
+    Follow the run's status and logs. Open your dashboard to inspect the outcome
+    and session evidence.
+  </Step>
+</Steps>

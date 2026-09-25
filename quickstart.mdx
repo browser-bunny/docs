@@ -1,47 +1,76 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Make your first API request"
+sidebarTitle: "Quickstart"
+description: "Connect to BrowserBunny and submit a browser test."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
+You need a BrowserBunny account, an API key, and an available test target.
+Manage your keys in the [dashboard](https://dash.browserbunny.dev).
 
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+## Connect to the API
 
-## Prerequisites
+Keep your API key in an environment variable. Send it in the `Authorization`
+header with the `Bearer` prefix.
 
-Before you begin, you must have:
+```bash
+export BROWSERBUNNY_API_KEY="YOUR_API_KEY"
+```
 
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
+Retrieve the device catalog:
 
-## Get started
+```bash
+curl --fail-with-body https://api.browserbunny.dev/v1/devices \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
+```
 
-<Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+Choose a device from the response whose `enabled` value is `true` and whose
+`locked` value is `false`. Use its `id` in your run request.
 
-    ```bash
-    npm install your-package
-    ```
-  </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+## Submit a test
 
-    ```bash
-    your-cli init
-    ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+Replace `DEVICE_ID` with your chosen device ID and set `start_url` to a site you
+are authorized to test. Describe the task in `test_task`.
 
-    ```bash
-    your-cli start
-    ```
-  </Step>
-</Steps>
+```bash
+curl --fail-with-body https://api.browserbunny.dev/v1/runs \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: first-homepage-test-001" \
+  --data '{
+    "start_url": "https://example.com",
+    "test_task": "Verify that the homepage loads and has a page title.",
+    "devices": ["DEVICE_ID"]
+  }'
+```
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+A new run returns HTTP `202`. Save the `id` from the response to retrieve its
+progress. Creating a run starts test execution and can consume account usage.
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+<Note>
+  Keep the same idempotency key and request body when retrying an uncertain
+  submission. Use a new key for a new test. Reusing a key with a changed request
+  returns HTTP `409`.
+</Note>
+
+## Follow the run
+
+Replace `RUN_ID` with the returned run ID:
+
+```bash
+curl --fail-with-body https://api.browserbunny.dev/v1/runs/RUN_ID \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
+```
+
+The run's `status` describes execution progress; `outcome` describes its result.
+A finished run has `status: "complete"`. Open the returned `run_url` while signed
+in to the owning account to review the run in your dashboard.
+
+Retrieve a page of logs:
+
+```bash
+curl --fail-with-body 'https://api.browserbunny.dev/v1/runs/RUN_ID/logs?limit=200' \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
+```
+
+If the response includes `next_cursor`, pass that value unchanged as the `cursor`
+query parameter to retrieve the next page.
