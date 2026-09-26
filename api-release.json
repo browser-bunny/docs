@@ -1,7 +1,7 @@
 {
   "api_version": "1.0.0",
-  "sdk_version": "0.8.0",
-  "backend_bundle_sha256": "3c7d547029115ced9595afc6974d29cdd843ccaa4b5266902447775035fefcf8",
-  "openapi_sha256": "f9eb0ff6f662bc12a1186baaa1363a1b28abb469c3ba875d3e8967786e14e18f",
+  "sdk_version": "0.9.0",
+  "backend_bundle_sha256": "2293becbdedb8784ac5f726b6df9d5d5a3c92d8ea23bbc55bffed3c49397f05e",
+  "openapi_sha256": "9ad8b283403906b2da6f61fa7bc9429c9ec9c950e1c4824154d1a64ae31f9467",
   "contract_url": "https://api.browserbunny.dev/openapi/public-v1.json"
 }

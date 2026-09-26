@@ -223,10 +223,9 @@ Test-level events have `execution_id: null`.
 
 ### Inspect network evidence
 
-Each execution has a `network` reference when evidence collection is initialized.
-Read its [request timeline](/network) to compare request outcomes and timings with
-the execution's actions and checks. Network activity events include a typed
-`data` object and expire after 14 days.
+Use an execution's `network_url` to [inspect its requests](/network), or set
+`errors_only=true` to find HTTP errors and transport failures. Network information
+expires after 14 days. An HTTP error does not automatically fail the test.
 
 ## Cancel and clean up
 

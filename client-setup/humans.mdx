@@ -22,10 +22,10 @@ export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 </Tab>
 <Tab title="Python">
 
-Use Python 3.10 or newer. Install the hosted client package, version 0.8.0:
+Use Python 3.10 or newer. Install the hosted client package, version 0.9.0:
 
 ```bash
-python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.8.0-py3-none-any.whl
+python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.9.0-py3-none-any.whl
 export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 ```
 
@@ -197,6 +197,7 @@ Call these methods on a `BrowserBunny` client:
 | `tests.list()` | Read a page of project tests |
 | `tests.wait()` | Poll until terminal |
 | `tests.logs()` | Read a page of test logs |
+| `tests.network()` | Read an execution's network requests |
 | `tests.cancel()` | Request cancellation |
 | `close()` | Close HTTP connections |
 
@@ -210,6 +211,8 @@ Call these methods on a `BrowserBunny` client:
   (default 900) and `poll_interval` (default 2), both in seconds.
 - `tests.logs()`: requires `test_id`; optional keyword arguments `execution_id`,
   `cursor`, and `limit` (default 200).
+- `tests.network()`: requires `test_id` and `execution_id`; optional keyword
+  arguments `errors_only` (default `False`), `cursor`, and `limit` (default 200).
 
 </Accordion>
 
