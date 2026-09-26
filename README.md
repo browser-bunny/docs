@@ -40,7 +40,7 @@ contract with equivalent cURL, Python, and JavaScript examples, without duplicat
 endpoint schemas. Use matching `cURL`, `Python`, and `JavaScript` labels in
 `CodeGroup`, `RequestExample`, and `Tabs` components so selections synchronize.
 Keep prose and headings language-neutral; put client-specific setup and behavior
-inside the matching tab on `client-setup.mdx`. JSON response examples stay shared.
+inside the matching tab on `client-setup/humans.mdx`. JSON response examples stay shared.
 
 Structure guides for mobile scanning: use task headings, numbered steps for
 workflows, labeled bullets for independent rules, and narrow tables for field or
@@ -53,6 +53,15 @@ Keep the native Copy Page action enabled first in `contextual.options` and set
 `contextual.display` to `header`. It applies to every guide and endpoint page.
 The shared stylesheet gives this control a visible accent and 44px touch target;
 retain Mintlify's native Markdown copying and success feedback.
+
+## Setup paths
+
+`client-setup.mdx` offers two paths: `client-setup/agents.mdx` for the public
+Mintlify documentation MCP and `client-setup/humans.mdx` for direct API clients.
+The MCP endpoint is `https://browserbunny.dev/docs/mcp`. It provides documentation
+retrieval; browser-test execution uses the authenticated `/v1` API. Keep that
+scope explicit and verify the live MCP handshake and advertised tools before
+changing connection guidance. Do not put project API keys in the public MCP config.
 
 ## Release workflow
 

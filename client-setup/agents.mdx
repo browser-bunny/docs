@@ -1,0 +1,162 @@
+---
+title: "For agents"
+description: "Connect your coding agent to BrowserBunny documentation through MCP."
+---
+
+Give your agent access to current API documentation, examples, and browser
+capabilities. It can use that guidance to build your integration and submit tests.
+
+## Connect the MCP server
+
+| Setting | Value |
+| --- | --- |
+| Name | `browserbunny-docs` |
+| Transport | Streamable HTTP |
+| Authentication | None for public documentation |
+
+Copy this server URL into your client's MCP settings:
+
+```text MCP server URL
+https://browserbunny.dev/docs/mcp
+```
+
+### Choose your client
+
+<Tabs>
+<Tab title="Codex">
+
+Add the server and verify that it is listed:
+
+```bash
+codex mcp add browserbunny-docs --url https://browserbunny.dev/docs/mcp
+codex mcp list
+```
+
+Alternatively, merge this entry into `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.browserbunny-docs]
+url = "https://browserbunny.dev/docs/mcp"
+```
+
+See the [Codex connection guide](https://developers.openai.com/learn/docs-mcp).
+
+</Tab>
+<Tab title="Claude Code">
+
+Run these commands from the project where you use your agent:
+
+```bash
+claude mcp add --transport http browserbunny-docs https://browserbunny.dev/docs/mcp
+claude mcp get browserbunny-docs
+```
+
+See the [Claude Code MCP guide](https://code.claude.com/docs/en/mcp).
+
+</Tab>
+<Tab title="Cursor">
+
+Merge this server into your project's `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "browserbunny-docs": {
+      "url": "https://browserbunny.dev/docs/mcp"
+    }
+  }
+}
+```
+
+Enable the server in your MCP settings. See the
+[Cursor MCP guide](https://cursor.com/docs/mcp).
+
+</Tab>
+<Tab title="VS Code">
+
+Merge this server into your project's `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "browserbunny-docs": {
+      "type": "http",
+      "url": "https://browserbunny.dev/docs/mcp"
+    }
+  }
+}
+```
+
+Start the server from its configuration and enable its tools in your agent chat.
+See the [VS Code MCP guide](https://code.visualstudio.com/docs/agent-customization/mcp-servers).
+
+</Tab>
+<Tab title="Other clients">
+
+1. Add a remote MCP server named `browserbunny-docs`.
+2. Set its URL to `https://browserbunny.dev/docs/mcp`.
+3. Select HTTP transport and leave authentication unset.
+4. Connect and enable its documentation tools.
+
+</Tab>
+</Tabs>
+
+From any docs page, the menu beside **Copy Page** also offers the MCP URL,
+installation command, and connection options for supported editors.
+
+## Verify the connection
+
+Ask your agent:
+
+```text
+Use the BrowserBunny documentation MCP to find how to create a test.
+Tell me the required request fields, default environment, and how to
+follow the result. Link to the relevant documentation.
+```
+
+A working connection returns current guidance from these pages:
+
+- [Create a test](/api-reference/create-test).
+- [Choose environments](/environments).
+- [Follow results](/results).
+
+## Enable test submission
+
+The MCP server supplies documentation search and retrieval. Browser tests are
+created, read, and cancelled through the authenticated API.
+
+1. Create a project API key in the [dashboard](https://dash.browserbunny.dev).
+2. Make sure the account has test minutes.
+3. Set `BROWSERBUNNY_API_KEY` in the environment where your agent's code runs.
+4. Give the agent an HTTP client or terminal to call the API.
+
+Keep the project key in that execution environment; the public documentation MCP
+connection does not need it. See [authentication](/authentication) for project access.
+
+### Give your agent a first task
+
+```text
+Use the BrowserBunny documentation MCP to read the current test API.
+The project key is available as BROWSERBUNNY_API_KEY.
+
+Create a test for https://example.com with these instructions:
+"Verify that the page heading is Example Domain."
+
+Use the default environment. Retain the test ID, poll until terminal,
+and report the status, execution checks, and dashboard URL.
+```
+
+## Troubleshoot setup
+
+| Symptom | Next step |
+| --- | --- |
+| Server does not connect | Check the full HTTPS URL, including `/docs/mcp`, and HTTP transport |
+| Agent does not use the docs | Enable the server's tools and explicitly ask it to use the BrowserBunny MCP |
+| Agent can read docs but cannot create a test | Provide an HTTP client or terminal, project key, and test minutes |
+| A test request is rejected | Inspect the API error and follow [errors and limits](/errors-and-limits) |
+
+## Next steps
+
+- [Quickstart](/quickstart): the complete request and polling flow.
+- [API reference](/api-reference/create-test): request and response fields.
+- [Direct client setup](/client-setup/humans): installation and connection details.

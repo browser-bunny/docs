@@ -17,9 +17,16 @@
             "group": "Get started",
             "pages": [
               "index",
+              {
+                "group": "Client setup",
+                "pages": [
+                  "client-setup",
+                  "client-setup/agents",
+                  "client-setup/humans"
+                ]
+              },
               "quickstart",
-              "authentication",
-              "client-setup"
+              "authentication"
             ]
           },
           {
@@ -84,6 +91,7 @@
       "claude",
       "perplexity",
       "mcp",
+      "add-mcp",
       "cursor",
       "vscode"
     ]
