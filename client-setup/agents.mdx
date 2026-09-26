@@ -152,14 +152,6 @@ Keep your key in a secret setting or environment variable. Do not paste it into
 agent prompts or commit it to your repository. The configurations above reference
 the key without storing its value in the file.
 
-### Use staging
-
-Use a staging project key and replace the URL with:
-
-```text Staging MCP server URL
-https://api.staging.browserbunny.dev/v1/mcp
-```
-
 ## Verify the connection
 
 Ask your agent:
@@ -228,7 +220,7 @@ See [results](/results) for execution checks, evidence, and usage.
 
 | Symptom | Next step |
 | --- | --- |
-| Connection returns `401` or `403` | Check the Authorization header, key status, and matching production or staging URL |
+| Connection returns `401` or `403` | Check the Authorization header, key status, and MCP server URL above |
 | Agent only has documentation search | Connect to the API MCP URL above and enable its six test tools |
 | `minutes_required` | Add test minutes to the account that owns the key |
 | `invalid_request` | Check the named field against the tool's input schema |

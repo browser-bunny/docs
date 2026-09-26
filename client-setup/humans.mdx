@@ -53,16 +53,15 @@ Examples run on your server or in CI. Keep your project key out of browser code.
 
 ### Set up access
 
-1. Create your key in the [dashboard](https://dash.browserbunny.dev).
-2. Match the key's environment to the endpoint.
-3. Use the key for the project you want to access.
+1. Select the project you want to access in the [dashboard](https://dash.browserbunny.dev).
+2. Create a key for that project.
+3. Send the key in the `Authorization: Bearer` header.
 
-See [authentication](/authentication) for base URLs and project access.
+See [authentication](/authentication) for project access.
 
 ## Configure the connection
 
-- **Default endpoint:** production.
-- **Staging:** change the base URL and key together.
+- **API base URL:** `https://api.browserbunny.dev`.
 - **HTTP timeout:** limits a single request; it does not cancel an accepted test.
 
 <Tabs>
@@ -83,20 +82,13 @@ curl --fail-with-body --max-time 30 \
 ```python
 from browserbunny import BrowserBunny
 
-with BrowserBunny(environment="production", timeout=30) as client:
+with BrowserBunny(timeout=30) as client:
     print(client.environments.list())
 ```
 
-**Environment fallbacks**
-
-- `api_key` reads `BROWSERBUNNY_API_KEY` when omitted.
-- `environment` reads `BROWSERBUNNY_ENV` when omitted.
-- `base_url` reads `BROWSERBUNNY_BASE_URL` when omitted.
-
-- **Precedence:** explicit arguments take priority over environment variables.
-- **Custom endpoint:** an explicit `base_url` overrides the environment's hosted URL.
+- **API key:** `api_key` reads `BROWSERBUNNY_API_KEY` when omitted. An explicit key
+  takes priority over the environment variable.
 - **Timeout:** `timeout` sets the HTTP request timeout in seconds.
-- **Staging:** use `environment="staging"` with a staging key.
 
 </Tab>
 <Tab title="JavaScript">

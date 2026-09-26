@@ -2516,10 +2516,6 @@
     {
       "description": "Production",
       "url": "https://api.browserbunny.dev"
-    },
-    {
-      "description": "Staging",
-      "url": "https://api.staging.browserbunny.dev"
     }
   ]
 }

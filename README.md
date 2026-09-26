@@ -2,6 +2,9 @@
 
 Live site: https://browserbunny.dev/docs
 
+Public guides, setup instructions, examples, and OpenAPI servers document only
+the production API at `https://api.browserbunny.dev`.
+
 Mintlify publishes this repository's `main` branch. The marketing Vercel project
 proxies `/docs` and the Mintlify asset/API routes to
 `https://browser-bunny.mintlify.site`. Documentation changes do not require a
