@@ -49,6 +49,11 @@ methods in an accordion and next actions in linked cards or a short list. Avoid
 paragraphs that combine status enums, field definitions, and unrelated caveats.
 Keep reference-page parameters and responses generated from OpenAPI.
 
+Keep the native Copy Page action enabled first in `contextual.options` and set
+`contextual.display` to `header`. It applies to every guide and endpoint page.
+The shared stylesheet gives this control a visible accent and 44px touch target;
+retain Mintlify's native Markdown copying and success feedback.
+
 ## Release workflow
 
 1. In the backend checkout, run the backend and SDK tests, then generate:

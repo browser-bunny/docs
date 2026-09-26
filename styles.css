@@ -50,6 +50,25 @@ img.nav-logo {
 
 .bb-card:hover { border-color: var(--bb-accent); }
 
+/* Keep Mintlify's native page-copy action visible and easy to tap. */
+#page-context-menu-button {
+  min-height: 44px;
+  color: var(--bb-accent);
+  background: var(--bb-surface);
+  border-color: var(--bb-accent);
+}
+
+#page-context-menu-button:hover {
+  background: rgb(234, 141, 255, 0.12);
+}
+
+#page-context-menu-button + button {
+  min-height: 44px;
+  min-width: 44px;
+  background: var(--bb-surface);
+  border-color: var(--bb-accent);
+}
+
 .bb-kicker {
   display: inline-block;
   margin: 0 0 1rem;
