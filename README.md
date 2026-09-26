@@ -36,7 +36,11 @@ administrator APIs. Do not use the combined `/openapi.json` document.
 
 Endpoint MDX files select exactly one operation from `openapi/public-v1.json`;
 Mintlify renders its parameters and responses directly. Guides explain the same
-contract and the Python SDK, without duplicating endpoint schemas.
+contract with equivalent cURL, Python, and JavaScript examples, without duplicating
+endpoint schemas. Use matching `cURL`, `Python`, and `JavaScript` labels in
+`CodeGroup`, `RequestExample`, and `Tabs` components so selections synchronize.
+Keep prose and headings language-neutral; put client-specific setup and behavior
+inside the matching tab on `client-setup.mdx`. JSON response examples stay shared.
 
 ## Release workflow
 

@@ -8,8 +8,36 @@ Test IDs begin with `test_`; execution IDs begin with `exec_`.
 
 ## Follow status
 
-Read `GET /v1/tests/{test_id}` or `client.tests.get(test_id)`.
-`client.tests.wait(test_id)` polls until the test is terminal.
+Read the test about every two seconds until it reaches a terminal status.
+Replace `TEST_ID` with the ID returned when you created the test.
+
+<CodeGroup>
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
+```
+
+```python Python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    test = client.tests.get("TEST_ID")
+    print(test)
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.browserbunny.dev/v1/tests/TEST_ID", {
+  headers: {
+    Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`
+  }
+});
+const test = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(test));
+console.log(test);
+```
+
+</CodeGroup>
 
 | Status | Meaning |
 | --- | --- |
@@ -49,17 +77,65 @@ coverage details. `conditions` contains resolved settings and their verification
 Read these fields to distinguish a website failure from unsupported setup or
 insufficient evidence. Dashboard and session URLs require account sign-in.
 
-## List tests and read logs
+## List tests
 
-```python
-tests = client.tests.list(limit=50)
-for test in tests["data"]:
-    print(test["id"], test["status"])
+<CodeGroup>
 
-page = client.tests.logs(test_id, limit=200)
-for event in page["data"]:
-    print(event["time"], event["execution_id"], event["phase"], event["message"])
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests?limit=50" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
+
+```python Python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    page = client.tests.list(limit=50)
+    print(page)
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.browserbunny.dev/v1/tests?limit=50", {
+  headers: {
+    Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`
+  }
+});
+const page = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(page));
+console.log(page);
+```
+
+</CodeGroup>
+
+## Read logs
+
+<CodeGroup>
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID/logs?limit=200" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
+```
+
+```python Python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    page = client.tests.logs("TEST_ID", limit=200)
+    print(page)
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.browserbunny.dev/v1/tests/TEST_ID/logs?limit=200", {
+  headers: {
+    Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`
+  }
+});
+const page = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(page));
+console.log(page);
+```
+
+</CodeGroup>
 
 Pass `next_cursor` unchanged to get the next page. Test pages contain up to 100
 items; log pages contain up to 500 events. Use an execution's ID as `execution_id`
@@ -72,14 +148,39 @@ have `execution_id: null`.
 
 ## Cancel and clean up
 
-```python
-client.tests.cancel(test_id)
-result = client.tests.wait(test_id)
+<CodeGroup>
+
+```bash cURL
+curl --fail-with-body -X POST "https://api.browserbunny.dev/v1/tests/TEST_ID/cancel" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
+
+```python Python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    test = client.tests.cancel("TEST_ID")
+    print(test)
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.browserbunny.dev/v1/tests/TEST_ID/cancel", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`
+  }
+});
+const test = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(test));
+console.log(test);
+```
+
+</CodeGroup>
 
 Cancellation is cooperative. Continue polling until a terminal status confirms
 that execution and cleanup have finished. Cancelling a terminal test returns it
-unchanged. Closing the SDK or reaching a local wait timeout does not cancel it.
+unchanged. Closing a connection or reaching a local polling timeout does not
+cancel the remote test.
 
 ## Read usage
 

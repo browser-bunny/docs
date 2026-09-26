@@ -19,7 +19,7 @@
               "index",
               "quickstart",
               "authentication",
-              "python-sdk"
+              "client-setup"
             ]
           },
           {
@@ -87,7 +87,7 @@
       "vscode"
     ]
   },
-  "description": "Browser tests, in your words. Guides for the BrowserBunny API and Python SDK.",
+  "description": "Browser tests, in your words. Guides and reference for the BrowserBunny API.",
   "appearance": {
     "default": "dark",
     "strict": true
@@ -104,5 +104,15 @@
   },
   "icons": {
     "library": "lucide"
+  },
+  "api": {
+    "examples": {
+      "languages": [
+        "curl",
+        "python",
+        "javascript"
+      ],
+      "autogenerate": false
+    }
   }
 }

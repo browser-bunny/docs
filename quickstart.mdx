@@ -5,7 +5,8 @@ description: "Create a browser test and follow its result."
 ---
 
 Create a project API key in the [dashboard](https://dash.browserbunny.dev) and
-make sure your account has test minutes.
+make sure your account has test minutes. Complete [client setup](/client-setup)
+for your chosen language, then set your project key:
 
 ```bash
 export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
@@ -17,16 +18,50 @@ Provide a public HTTPS `start_url` and explain what to do and verify in
 `instructions`. Omitting `environments` selects Windows desktop Chrome with the
 latest browser release available from AWS.
 
-```bash
-curl --fail-with-body https://api.browserbunny.dev/v1/tests \
+<CodeGroup>
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
   -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: first-homepage-test-001" \
   --data '{
+  "start_url": "https://example.com",
+  "instructions": "Verify that the page heading is Example Domain."
+}'
+```
+
+```python Python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    test = client.tests.create(
+        start_url='https://example.com',
+        instructions='Verify that the page heading is Example Domain.',
+        idempotency_key="first-homepage-test-001",
+    )
+    print(test)
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.browserbunny.dev/v1/tests", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "first-homepage-test-001"
+  },
+  body: JSON.stringify({
     "start_url": "https://example.com",
     "instructions": "Verify that the page heading is Example Domain."
-  }'
+  })
+});
+const test = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(test));
+console.log(test);
 ```
+
+</CodeGroup>
 
 The API returns HTTP `202` with a test whose ID starts with `test_`. It contains
 one `executions` entry for each selected environment. Save the test ID: creation
@@ -40,10 +75,35 @@ existing test with HTTP `200`; changed input with the same key returns `409`.
 
 Replace `TEST_ID` with the returned ID:
 
-```bash
-curl --fail-with-body https://api.browserbunny.dev/v1/tests/TEST_ID \
+<CodeGroup>
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID" \
   -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
+
+```python Python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    test = client.tests.get("TEST_ID")
+    print(test)
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.browserbunny.dev/v1/tests/TEST_ID", {
+  headers: {
+    Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`
+  }
+});
+const test = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(test));
+console.log(test);
+```
+
+</CodeGroup>
+
+Repeat this request about every two seconds until `status` is terminal.
 
 `status` is `queued`, `running`, or `cancelling` while work is active. The terminal
 statuses are `passed`, `failed`, `inconclusive`, `error`, and `cancelled`.
@@ -53,22 +113,6 @@ Open the returned `url` while signed in to see the test in the dashboard. Each
 execution also has a `session_url`, checks, and any preparation or execution error.
 A `202` means the request was accepted; unsupported instructions can still produce
 an execution error before a browser is allocated.
-
-## Use Python
-
-Install [SDK 0.7.0](/python-sdk), then create and wait explicitly:
-
-```python
-from browserbunny import BrowserBunny
-
-with BrowserBunny() as client:
-    test = client.tests.create(
-        start_url="https://example.com",
-        instructions='Verify that the page heading is "Example Domain".',
-    )
-    result = client.tests.wait(test["id"])
-    print(result["status"], result["url"])
-```
 
 Next, [select environments](/environments), [upload a file](/files), or describe
 [network and language conditions](/conditions). The [API reference](/api-reference/create-test)

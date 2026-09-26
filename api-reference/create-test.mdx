@@ -2,3 +2,48 @@
 title: "Create a test"
 openapi: "/openapi/public-v1.json POST /v1/tests"
 ---
+
+<RequestExample>
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: first-homepage-test-001" \
+  --data '{
+  "start_url": "https://example.com",
+  "instructions": "Verify that the page heading is Example Domain."
+}'
+```
+
+```python Python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    test = client.tests.create(
+        start_url='https://example.com',
+        instructions='Verify that the page heading is Example Domain.',
+        idempotency_key="first-homepage-test-001",
+    )
+    print(test)
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.browserbunny.dev/v1/tests", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`,
+    "Content-Type": "application/json",
+    "Idempotency-Key": "first-homepage-test-001"
+  },
+  body: JSON.stringify({
+    "start_url": "https://example.com",
+    "instructions": "Verify that the page heading is Example Domain."
+  })
+});
+const test = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(test));
+console.log(test);
+```
+
+</RequestExample>

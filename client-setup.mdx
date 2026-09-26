@@ -1,0 +1,188 @@
+---
+title: "Client setup"
+description: "Prepare your client, authenticate requests, and configure connection behavior."
+---
+
+The API uses HTTPS and JSON. Every example sends the same request fields and reads
+the same response fields. Choose a language tab for the client syntax you prefer.
+
+## Prepare your client
+
+<Tabs>
+<Tab title="cURL">
+
+Use cURL 7.76 or newer for the `--fail-with-body` option shown in these guides.
+It preserves the response body and exits with an error for HTTP failures.
+
+```bash
+curl --version
+export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
+```
+
+</Tab>
+<Tab title="Python">
+
+Use Python 3.10 or newer. Install the hosted client package, version 0.7.0:
+
+```bash
+python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.7.0-py3-none-any.whl
+export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
+```
+
+Examples use the `BrowserBunny` context manager to close HTTP connections.
+Responses are dictionaries with type hints. The client sends the supplied fields
+without rewriting instructions or downloading files.
+
+</Tab>
+<Tab title="JavaScript">
+
+Use a supported Node.js release with built-in `fetch`. Save examples in an `.mjs`
+file so you can use top-level `await`. No additional package is required.
+
+```bash
+export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
+node example.mjs
+```
+
+Examples run on your server or in CI. Keep your project key out of browser code.
+
+</Tab>
+</Tabs>
+
+Create your key in the [dashboard](https://dash.browserbunny.dev). The key selects
+the project and must belong to the same environment as the endpoint. See
+[authentication](/authentication) for base URLs and project access.
+
+## Configure the connection
+
+Production is the default endpoint in the examples. Change the base URL and key
+together to use staging. An HTTP request timeout limits a single request; it does
+not cancel a test that the service has already accepted.
+
+<Tabs>
+<Tab title="cURL">
+
+Set the base URL explicitly. `--max-time` limits the request to 30 seconds:
+
+```bash
+export BROWSERBUNNY_BASE_URL="https://api.browserbunny.dev"
+curl --fail-with-body --max-time 30 \
+  "$BROWSERBUNNY_BASE_URL/v1/environments" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
+```
+
+</Tab>
+<Tab title="Python">
+
+```python
+from browserbunny import BrowserBunny
+
+with BrowserBunny(environment="production", timeout=30) as client:
+    print(client.environments.list())
+```
+
+The constructor reads `BROWSERBUNNY_API_KEY`, `BROWSERBUNNY_ENV`, and
+`BROWSERBUNNY_BASE_URL` when their arguments are omitted. Explicit `api_key`,
+`environment`, and `base_url` arguments take priority over environment variables.
+An explicit `base_url` overrides the environment's hosted URL. `timeout` sets the
+HTTP request timeout in seconds. Use `environment="staging"` with a staging key.
+
+</Tab>
+<Tab title="JavaScript">
+
+Set the base URL explicitly and pass an abort signal for a 30-second timeout:
+
+```javascript
+const baseUrl = "https://api.browserbunny.dev";
+const response = await fetch(`${baseUrl}/v1/environments`, {
+  headers: { Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}` },
+  signal: AbortSignal.timeout(30_000)
+});
+const catalog = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(catalog));
+console.log(catalog);
+```
+
+</Tab>
+</Tabs>
+
+## Follow results and handle errors
+
+Creating a test returns after acceptance. Poll its ID until a terminal status,
+or resume polling later if your local deadline expires. Closing a connection
+does not cancel remote work. See [results](/results) for status, logs, and cancellation.
+
+Use a stable idempotency key when retrying an uncertain submission. HTTP errors
+and execution errors are separate: a request can succeed and its test can later
+fail during preparation or execution. See [errors and limits](/errors-and-limits).
+
+<Tabs>
+<Tab title="cURL">
+
+Use `--fail-with-body` to detect HTTP errors and inspect the returned JSON.
+Poll `GET /v1/tests/TEST_ID` about every two seconds until `status` is terminal.
+Keep the same `Idempotency-Key` header when retrying an uncertain create request.
+
+</Tab>
+<Tab title="Python">
+
+`wait()` polls every two seconds with a default local timeout of 900 seconds.
+On `TestTimeoutError`, retain `.test_id` and `.last_test` to resume later.
+
+```python
+from browserbunny import APIError, BrowserBunny, TestTimeoutError
+
+with BrowserBunny() as client:
+    try:
+        result = client.tests.wait("TEST_ID", timeout=900, poll_interval=2)
+        print(result["status"], result["url"])
+    except TestTimeoutError as error:
+        print("Still pending:", error.test_id)
+    except APIError as error:
+        print(error.code, error.message, error.param, error.request_id)
+```
+
+`create()` accepts `idempotency_key`; it generates a fresh key when omitted and
+never retries POST requests automatically. Supply your own stable key for CI
+jobs and uncertain retries.
+
+HTTP exceptions include `AuthenticationError`, `ValidationError`, `BillingError`,
+`RateLimitError`, and `UnsupportedOperationError`. They expose `status_code`,
+`code`, `message`, `param`, `request_id`, and `retry_after` when available.
+Gateway errors still select an exception by HTTP status when application error
+fields are unavailable. `TransportError` means a request could not complete and
+its remote result may be unknown. `ConfigurationError` covers client configuration.
+All client errors inherit from `BrowserBunnyError`; invalid local argument shapes
+can raise `ValueError`.
+
+<Accordion title="Client methods">
+
+| Method | Behavior |
+| --- | --- |
+| `client.environments.list()` | Return available environments and capabilities |
+| `client.tests.create(start_url, instructions, *, environments=None, files=None, idempotency_key=None)` | Create and return an accepted test |
+| `client.tests.get(test_id)` | Read status, executions, checks, usage, and billing |
+| `client.tests.list(*, cursor=None, limit=50)` | Return a project test page with `data` and `next_cursor` |
+| `client.tests.wait(test_id, *, timeout=900, poll_interval=2)` | Poll until a terminal status |
+| `client.tests.logs(test_id, *, execution_id=None, cursor=None, limit=200)` | Return a log page with `data`, `cursor`, and `next_cursor` |
+| `client.tests.cancel(test_id)` | Request cooperative cancellation |
+| `client.close()` | Close the client's HTTP connections |
+
+</Accordion>
+
+</Tab>
+<Tab title="JavaScript">
+
+`fetch` resolves normally for HTTP failures, so check `response.ok` before using
+the response as a successful result. A rejected fetch or an expired abort signal
+can leave a submission's remote result unknown. Retain the original idempotency
+key when retrying it.
+
+Poll `GET /v1/tests/TEST_ID` about every two seconds until `status` is terminal.
+The terminal statuses are `passed`, `failed`, `inconclusive`, `error`, and
+`cancelled`.
+
+</Tab>
+</Tabs>
+
+Continue with the [quickstart](/quickstart) to create a test.

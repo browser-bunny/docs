@@ -4,20 +4,109 @@ description: "Select Windows browsers and inspect their supported capabilities."
 ---
 
 An environment names the device category, operating system, browser, and requested
-browser release. The same objects work in HTTP and Python. Each list entry creates
-one execution of your instructions.
+browser release. Each list entry creates one execution of your instructions:
 
-```json
-{
+<CodeGroup>
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{
   "start_url": "https://example.com",
   "instructions": "Verify that the page heading is Example Domain.",
   "environments": [
-    {"device": "desktop", "os": "windows", "browser": "chrome", "browser_version": "latest"},
-    {"device": "desktop", "os": "windows", "browser": "firefox", "browser_version": "previous"},
-    {"device": "desktop", "os": "windows", "browser": "edge", "browser_version": "latest"}
+    {
+      "device": "desktop",
+      "os": "windows",
+      "browser": "chrome",
+      "browser_version": "latest"
+    },
+    {
+      "device": "desktop",
+      "os": "windows",
+      "browser": "firefox",
+      "browser_version": "previous"
+    },
+    {
+      "device": "desktop",
+      "os": "windows",
+      "browser": "edge",
+      "browser_version": "latest"
+    }
   ]
-}
+}'
 ```
+
+```python Python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    test = client.tests.create(
+        start_url='https://example.com',
+        instructions='Verify that the page heading is Example Domain.',
+        environments=[
+            {
+                "device": "desktop",
+                "os": "windows",
+                "browser": "chrome",
+                "browser_version": "latest"
+            },
+            {
+                "device": "desktop",
+                "os": "windows",
+                "browser": "firefox",
+                "browser_version": "previous"
+            },
+            {
+                "device": "desktop",
+                "os": "windows",
+                "browser": "edge",
+                "browser_version": "latest"
+            }
+        ],
+    )
+    print(test)
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.browserbunny.dev/v1/tests", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    "start_url": "https://example.com",
+    "instructions": "Verify that the page heading is Example Domain.",
+    "environments": [
+      {
+        "device": "desktop",
+        "os": "windows",
+        "browser": "chrome",
+        "browser_version": "latest"
+      },
+      {
+        "device": "desktop",
+        "os": "windows",
+        "browser": "firefox",
+        "browser_version": "previous"
+      },
+      {
+        "device": "desktop",
+        "os": "windows",
+        "browser": "edge",
+        "browser_version": "latest"
+      }
+    ]
+  })
+});
+const test = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(test));
+console.log(test);
+```
+
+</CodeGroup>
 
 Windows desktop supports Chrome, Firefox, and Edge, each with `latest` and
 `previous`: six available combinations. Browsers start on demand in AWS Device Farm
@@ -42,14 +131,35 @@ those details are available.
 
 ## Discover capabilities
 
-```python
-catalog = client.environments.list()
-print(catalog["default"])
-for environment in catalog["data"]:
-    print(environment["browser"], environment["browser_version"], environment["capabilities"])
+<CodeGroup>
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/environments" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
-The HTTP endpoint is `GET /v1/environments`. Its `default` is the environment used
+```python Python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    catalog = client.environments.list()
+    print(catalog)
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.browserbunny.dev/v1/environments", {
+  headers: {
+    Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`
+  }
+});
+const catalog = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(catalog));
+console.log(catalog);
+```
+
+</CodeGroup>
+
+The response's `default` is the environment used
 when you omit selection; `data` contains available combinations and their
 capabilities. Copy the four selection fields into a create request, without the
 read-only `capabilities` object.

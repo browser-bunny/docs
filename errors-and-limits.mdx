@@ -6,15 +6,15 @@ description: "Handle submission errors and retry without creating duplicate test
 ## Retry a submission
 
 Use an optional `Idempotency-Key` on `POST /v1/tests`: 8–128 letters, numbers,
-periods, underscores, colons, or hyphens. The SDK generates one when omitted.
-Retain your own stable key when you need to retry an uncertain submission.
+periods, underscores, colons, or hyphens. Retain a stable key when you need to
+retry an uncertain submission.
 
 A new submission returns `202`. The same key and request return the existing test
 with `200`. Changing the starting URL, trimmed instructions, resolved environment
 selection, project, or nonempty file list with that key returns `409`. File order
 matters. An identical replay does not create another execution.
 
-The SDK never retries POST requests automatically. Use a new key for a new test.
+Only retry an uncertain submission with its original key. Use a new key for a new test.
 The release selectors `latest` and `previous` can resolve to different installed
 versions over time; inspect `actual_environment` when comparing separate tests.
 
@@ -48,8 +48,8 @@ Application-generated errors have this structure:
 AWS API Gateway can reject authentication or throttle a request before it reaches
 the application. Those responses can use the gateway's own JSON shape, such as
 `{"message": "Unauthorized"}`, and may have no application `request_id` or `req_`
-identifier. The SDK still selects its typed exception from the HTTP status;
-application-specific error fields may be unavailable.
+identifier. Handle these errors by HTTP status when application-specific error
+fields are unavailable.
 
 Keep `request_id` for support when present. A successful asynchronous submission can later
 finish with an execution error. Read `executions[].error`, conditions, and checks
@@ -77,5 +77,5 @@ use several steps. Simplify or split requests that exceed that plan.
 
 Accepted executions may queue while browser capacity is occupied. Available
 minutes, credit reservations, and settlement can also affect admission. Acceptance
-does not reserve an immediate browser start. The SDK's default 900-second wait
-limits local polling and can expire while the remote test is still queued.
+does not reserve an immediate browser start. Local polling timeouts can expire
+while the remote test is still queued. Retain the test ID to resume polling.
