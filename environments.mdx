@@ -3,8 +3,10 @@ title: "Choose test environments"
 description: "Select Windows browsers and inspect their supported capabilities."
 ---
 
-An environment names the device category, operating system, browser, and requested
-browser release. Each list entry creates one execution of your instructions:
+## Select browsers
+
+An environment names the device category, operating system, browser, and release.
+Each selected environment gets one execution of your instructions.
 
 <CodeGroup>
 
@@ -108,26 +110,43 @@ console.log(test);
 
 </CodeGroup>
 
-Windows desktop supports Chrome, Firefox, and Edge, each with `latest` and
-`previous`: six available combinations. Browsers start on demand in AWS Device Farm
-TestGrid and are released after execution.
+## Supported environments
 
-| Field | Values | Default |
-| --- | --- | --- |
-| `device` | `desktop` | `desktop` |
-| `os` | `windows` | `windows` |
-| `browser` | `chrome`, `firefox`, `edge` | `chrome` |
-| `browser_version` | `latest`, `previous` | `latest` |
+Windows desktop supports **six combinations**: Chrome, Firefox, and Edge, each
+with `latest` or `previous`. AWS Device Farm TestGrid starts browsers on demand
+and releases them after execution.
 
-Omit `environments` to use one default environment. An explicit list must be
-nonempty and contain distinct combinations after defaults are applied. Invalid
-combinations are rejected without substituting another target.
+| Field | Accepted values |
+| --- | --- |
+| `device` | `desktop` |
+| `os` | `windows` |
+| `browser` | `chrome`, `firefox`, `edge` |
+| `browser_version` | `latest`, `previous` |
 
-`latest` means the latest release AWS offers for that browser; `previous` means
-the preceding offered release. AWS manages the Windows version. The execution's
-`environment` records your selection, while `actual_environment` records the
-observed OS and installed browser versions after allocation. It is null until
-those details are available.
+### Defaults and validation
+
+- **Default environment:** Windows desktop, Chrome, `latest`.
+- **Omitted selection:** omitting `environments` creates one default execution.
+- **Omitted fields:** each field uses its corresponding default above.
+- **Explicit selection:** supply a nonempty list of distinct combinations after
+  defaults are applied.
+- **Invalid selection:** the API rejects it without substituting another target.
+
+### Release selection
+
+| Selector | Meaning |
+| --- | --- |
+| `latest` | The latest release AWS offers for that browser |
+| `previous` | The preceding release AWS offers for that browser |
+
+AWS manages the Windows version.
+
+### Requested and observed versions
+
+| Execution field | Meaning |
+| --- | --- |
+| `environment` | Your requested configuration |
+| `actual_environment` | Observed OS and installed browser versions after allocation; null until available |
 
 ## Discover capabilities
 
@@ -159,13 +178,21 @@ console.log(catalog);
 
 </CodeGroup>
 
-The response's `default` is the environment used
-when you omit selection; `data` contains available combinations and their
-capabilities. Copy the four selection fields into a create request, without the
-read-only `capabilities` object.
+### Read the catalog
 
-`capabilities.file_upload` describes file-input upload support.
-`capabilities.conditions` describes condition support, whether it is enabled for
-the deployment, and any unavailable reason. Network, locale, and timezone
-conditions are supported on Chrome only and require verification in each session.
-Read [conditions](/conditions) before combining them with multiple browsers.
+| Response field | Meaning |
+| --- | --- |
+| `default` | The environment used when you omit selection |
+| `data` | Available combinations and their capabilities |
+
+Copy only the four selection fields into a create request. The `capabilities`
+object is read-only.
+
+### Check supported features
+
+- **File uploads:** read `capabilities.file_upload` for file-input upload support.
+- **Conditions:** read `capabilities.conditions` for support, deployment enablement,
+  and any unavailable reason.
+
+Network, locale, and timezone conditions currently require **Chrome** and must be
+verified in each session. See [conditions](/conditions) before selecting multiple browsers.

@@ -3,7 +3,9 @@ title: "Network, language, and timezone"
 description: "Describe browser conditions in instructions and inspect their verification evidence."
 ---
 
-Write supported conditions in ordinary `instructions`:
+## Request browser conditions
+
+Write the conditions in ordinary `instructions` alongside the actions and checks:
 
 <CodeGroup>
 
@@ -47,72 +49,106 @@ console.log(test);
 
 </CodeGroup>
 
-The worker resolves conditions before allocating a browser, then applies and
-verifies them before the first site navigation. Conditions apply throughout an
-execution. Network, locale, and timezone conditions are currently supported on
-Chrome only; check `capabilities.conditions` in [environment discovery](/environments)
-for deployment availability.
+### Availability
 
-A `202` accepts the test for preparation. Unsupported or ambiguous conditions can
-produce an execution error afterward, before allocation. Explicit environment
-selection remains authoritative; instructions cannot silently switch browsers.
+- **Supported browser:** Chrome for network, locale, and timezone conditions.
+- **Deployment support:** check `capabilities.conditions` in [environment discovery](/environments).
+- **Browser selection:** instructions cannot silently replace an explicitly
+  selected environment.
+
+### Setup lifecycle
+
+1. Resolve conditions before allocating a browser.
+2. Apply and verify them before the first site navigation.
+3. Keep the conditions active throughout the execution.
+
+**Acceptance is asynchronous.** HTTP `202` accepts the test for preparation.
+Unsupported or ambiguous conditions can produce an execution error before allocation.
 
 ## Network simulation
 
-The supported presets use BrowserBunny profile version `2026-09-25.1`:
+Preset values use BrowserBunny profile version `2026-09-25.1`.
 
-| Preset | Download cap (kbps) | Upload cap (kbps) | Minimum response latency (ms) |
-| --- | ---: | ---: | ---: |
-| `3g` | 750 | 250 | 300 |
-| `slow` | 400 | 150 | 400 |
-| `fast` | 1600 | 750 | 150 |
+| Preset | Limits |
+| --- | --- |
+| `3g` | Download: 750 kbps; upload: 250 kbps; minimum latency: 300 ms |
+| `slow` | Download: 400 kbps; upload: 150 kbps; minimum latency: 400 ms |
+| `fast` | Download: 1,600 kbps; upload: 750 kbps; minimum latency: 150 ms |
 
-Rates are decimal kilobits per second. Minimum response latency measures the
-configured minimum from request sent to response headers received. You can state
-exact rates, units, and this latency meaning in instructions.
+### Units and verification
 
-These settings simulate browser traffic. They do not create a cellular connection.
-Readback verifies applied configuration, not achieved throughput or RTT. Downloads
-of supplied file sources happen separately from the browser's outgoing upload.
+- **Rates:** decimal kilobits per second.
+- **Minimum latency:** configured minimum time from request sent to response
+  headers received.
+- **Custom values:** state exact rates, units, and that latency meaning in instructions.
+- **Verification:** confirms the applied configuration, not achieved throughput or RTT.
+- **File sources:** source downloads happen separately from the browser's outgoing upload.
 
-## Language and timezone
+These settings simulate browser traffic; they do not create a cellular connection.
 
-Examples:
+## Locale and website language
+
+### Example instructions
 
 - “Set the browser locale to es-ES and verify the page heading.”
 - “Check that the website language is localized for users in Spain.”
-- “Use the Europe/Madrid browser timezone and verify the page loads.”
 
-A language-focused Spain request resolves to `es-ES` and records that assumption.
-It does not change IP location, GPS, or timezone. Browser language preferences and
-Intl locale are verified, with automatic translation disabled. A request to check
-website language adds a separate check of sampled rendered text. Locale setup
-alone does not establish that the website is localized.
+### What changes
 
-Timezone emulation is verified through Intl. Website checks cover the pages and
-content actually observed during the requested journey.
+- **Spain language requests:** resolve to `es-ES` and record the assumption.
+- **Browser settings:** language preferences and Intl locale are verified;
+  automatic translation is disabled.
+- **Website language checks:** an explicit request adds a check of sampled rendered text.
 
-## Read the resolved conditions
+Locale setup alone does not establish that the website is localized. It does not
+change IP location, GPS, or timezone.
 
-Each execution can include:
+## Timezone
 
-- `conditions.requirements`: requested and resolved settings.
-- `conditions.assumptions`: visible defaults used during interpretation.
-- `conditions.verification`: applied settings, timestamps, evidence, and
-  `verified`, `unverified`, or `error` status.
-- `checks`: website assertions and other requested verification.
+Example: “Use the Europe/Madrid browser timezone and verify the page loads.”
 
-Unverified setup stops execution with an error. Verified conditions do not alone
-make a website check pass. The accepted condition plan stays fixed within the
-execution; a new submission can be interpreted differently as the service evolves.
-Inspect saved resolved settings when comparing results.
+- Timezone emulation is verified through Intl.
+- Website checks cover only the pages and content observed during the journey.
 
-## Supported scope
+## Inspect condition evidence
 
-GPS, geographic IP routing, geofencing comparisons, staged condition changes,
-offline mode, HTTP jitter, and packet loss are unavailable. Exact RTT, one-way
-delay, regional pricing, and regional date or currency-format assertions are also
-unsupported. The catalog marks the `lossy` preset unavailable.
+Read the fields inside each execution's `conditions` object:
 
-Explicit desktop viewport resizing is a separate browser action. Describe the
-size in instructions when needed.
+| Field | Meaning |
+| --- | --- |
+| `requirements` | Requested and resolved settings |
+| `assumptions` | Defaults used during interpretation |
+| `verification` | Applied settings, timestamps, and evidence |
+
+The execution's separate `checks` field contains website assertions and other
+requested verification.
+
+### Verification statuses
+
+| Status | Meaning |
+| --- | --- |
+| `verified` | Applied settings were verified |
+| `unverified` | Setup could not be verified |
+| `error` | Condition setup or verification encountered an error |
+
+Unverified setup stops execution with an error. Verified conditions alone do not
+make a website check pass.
+
+### Compare repeated tests
+
+- The accepted condition plan stays fixed within an execution.
+- A new submission can be interpreted differently as the service evolves.
+- Compare the saved resolved settings when reviewing results.
+
+## Unsupported conditions
+
+| Category | Unavailable controls or assertions |
+| --- | --- |
+| Location | GPS, geographic IP routing, geofencing comparisons |
+| Connection behavior | Offline mode, HTTP jitter, packet loss, `lossy` preset |
+| Timing | Exact RTT or one-way delay |
+| Regional behavior | Regional pricing, date-format, or currency-format assertions |
+| Changes during a test | Staged condition changes |
+
+**Viewport resizing** is a separate supported browser action. Describe the
+required size in your instructions.

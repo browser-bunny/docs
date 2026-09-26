@@ -3,13 +3,17 @@ title: "Results, logs, and usage"
 description: "Follow test status and inspect evidence from each browser execution."
 ---
 
-A **test** contains your instructions and one **execution** per selected environment.
-Test IDs begin with `test_`; execution IDs begin with `exec_`.
+## Test and execution
+
+| Resource | Meaning |
+| --- | --- |
+| Test | Your instructions and one execution per selected environment; ID starts with `test_` |
+| Execution | One environment's browser work and evidence; ID starts with `exec_` |
 
 ## Follow status
 
-Read the test about every two seconds until it reaches a terminal status.
-Replace `TEST_ID` with the ID returned when you created the test.
+Replace `TEST_ID` with the ID returned when you created the test. Read it about
+every two seconds until its status is terminal.
 
 <CodeGroup>
 
@@ -39,43 +43,104 @@ console.log(test);
 
 </CodeGroup>
 
+### Active statuses
+
 | Status | Meaning |
 | --- | --- |
-| `queued` | Accepted and waiting to start |
-| `running` | Execution is in progress |
-| `cancelling` | Cancellation is requested; work and cleanup are finishing |
+| `queued` | Waiting to start |
+| `running` | Executing the test |
+| `cancelling` | Finishing cancellation and cleanup |
+
+### Terminal statuses
+
+| Status | Meaning |
+| --- | --- |
 | `passed` | Requested checks passed |
 | `failed` | A requested check failed |
 | `inconclusive` | Available evidence could not establish the result |
 | `error` | Preparation or execution could not complete |
 | `cancelled` | The test was cancelled |
 
-The last five statuses are terminal. Test status becomes terminal after every
-execution finishes, including browser cleanup. For mixed results, the aggregate
-uses the precedence `error`, `failed`, `cancelled`, `inconclusive`, then `passed`.
-Inspect executions to see each environment's result.
+Test status becomes terminal after every execution finishes, including browser cleanup.
+
+### Mixed execution results
+
+The aggregate status uses the first matching status in this order:
+
+1. `error`
+2. `failed`
+3. `cancelled`
+4. `inconclusive`
+5. `passed`
+
+Inspect individual executions to see each environment's result.
+
+## Read the test response
+
+### Completion counts
+
+Read the fields inside `execution_counts`:
+
+| Field | Meaning |
+| --- | --- |
+| `total` | Number of executions |
+| `finished` | Number finished, including failures and cancellations |
+
+### Evidence links
 
 | Test field | Meaning |
 | --- | --- |
-| `execution_counts.total` | Number of executions |
-| `execution_counts.finished` | Number finished, including failures and cancellations |
-| `executions` | Per-environment status, checks, conditions, and evidence links |
-| `url` | Dashboard page for the test |
-| `start_url`, `instructions`, `files` | Submitted inputs; surrounding instruction whitespace is trimmed when stored |
-| `project_id`, `project_name` | Project selected by the API key |
-| `started_at`, `finished_at` | Execution timing; null before applicable |
-| `usage`, `billing` | Accounting snapshots, when available |
+| `executions` | Per-environment results and evidence |
+| `url` | Dashboard page for the test; requires account sign-in |
 
-Each execution records the requested `environment`, observed `actual_environment`,
-`status`, `phase`, timestamps, and `session_url`. Its `error` is either null or an
-object with `code` and `message`. Preparation can fail before any browser exists.
-`phase` is `queued`, `planning`, `starting`, `executing`, `checking`, `cleanup`, or
-`finished`; it describes the current stage separately from the result status.
+### Inputs and ownership
 
-`checks` contain names, status, summaries, assertions, and available evidence or
-coverage details. `conditions` contains resolved settings and their verification.
-Read these fields to distinguish a website failure from unsupported setup or
-insufficient evidence. Dashboard and session URLs require account sign-in.
+| Field | Meaning |
+| --- | --- |
+| `start_url` | Submitted starting page |
+| `instructions` | Submitted instructions, with surrounding whitespace trimmed |
+| `files` | Supplied file source URLs |
+| `project_id` | Project selected by the API key |
+| `project_name` | Name of that project |
+
+### Timing and accounting
+
+| Field | Meaning |
+| --- | --- |
+| `started_at` | Execution start time; null before applicable |
+| `finished_at` | Completion time after execution and cleanup; null before applicable |
+| `usage` | Browser-time snapshot, when available |
+| `billing` | Accounting snapshot, when available |
+
+## Inspect each execution
+
+| Field | Meaning |
+| --- | --- |
+| `environment` | Requested browser configuration |
+| `actual_environment` | Observed OS and browser versions |
+| `status` | Execution result or active status |
+| `phase` | Current stage of work |
+| `session_url` | Session evidence link; requires account sign-in |
+| `error` | Null, or an object with `code` and `message` |
+| `checks` | Check names, statuses, summaries, assertions, and available evidence or coverage details |
+| `conditions` | Resolved browser settings and verification |
+
+Executions also record their timestamps. Preparation can fail before a browser exists.
+
+### Execution phases
+
+| Phase | Stage |
+| --- | --- |
+| `queued` | Waiting to start |
+| `planning` | Preparing the instruction plan |
+| `starting` | Starting the browser |
+| `executing` | Performing browser actions |
+| `checking` | Evaluating requested checks |
+| `cleanup` | Closing the browser and finishing cleanup |
+| `finished` | Execution is finished |
+
+Use `status` for the result and `phase` for the stage. Inspect `error`, `checks`,
+and `conditions` to distinguish website failures from setup errors or insufficient evidence.
 
 ## List tests
 
@@ -107,6 +172,9 @@ console.log(page);
 
 </CodeGroup>
 
+- **Page size:** default 50 tests; maximum 100.
+- **Next page:** pass `next_cursor` unchanged as `cursor`.
+
 ## Read logs
 
 <CodeGroup>
@@ -137,14 +205,21 @@ console.log(page);
 
 </CodeGroup>
 
-Pass `next_cursor` unchanged to get the next page. Test pages contain up to 100
-items; log pages contain up to 500 events. Use an execution's ID as `execution_id`
-to filter logs. Pagination fills the page with matching events before returning a
-continuation cursor.
+### Filter and paginate
 
-For logs, `next_cursor: null` means you have caught up. Retain the returned `cursor`
-watermark and pass it later to read newly appended events. Test-level log events
-have `execution_id: null`.
+- **Page size:** default 200 events; maximum 500.
+- **Filter:** pass an execution's ID as `execution_id`.
+- **Next page:** pass `next_cursor` unchanged as `cursor`.
+- **Matching events:** pagination fills the page with matching events before
+  returning a continuation cursor.
+
+### Follow new events
+
+1. Read pages until `next_cursor` is `null`.
+2. Retain the returned `cursor` watermark.
+3. Pass that watermark as `cursor` later to read newly appended events.
+
+Test-level events have `execution_id: null`.
 
 ## Cancel and clean up
 
@@ -177,18 +252,35 @@ console.log(test);
 
 </CodeGroup>
 
-Cancellation is cooperative. Continue polling until a terminal status confirms
-that execution and cleanup have finished. Cancelling a terminal test returns it
-unchanged. Closing a connection or reaching a local polling timeout does not
-cancel the remote test.
+1. Request cancellation.
+2. Continue polling the test.
+3. Stop once a terminal status confirms that execution and cleanup have finished.
+
+- **Already terminal:** cancellation returns the test unchanged.
+- **Local timeout or closed connection:** neither cancels the remote test.
 
 ## Read usage
 
-Read aggregate `usage` and per-execution `usage` from the test response.
-`browser_seconds` reports browser time; `complete` says whether that time has
-been confirmed. This confirmation is independent of the test status. Null usage
-means no snapshot is available; an incomplete value may still change.
+Read aggregate `usage` and each execution's `usage` from the test response.
 
-`billing` contains `status`, `amount_cents`, `currency`, `credit_seconds_used`, and
-`invoice_url` when available. Billing can settle after the test ends. Follow your
-account's available minutes and billing state in the dashboard.
+| Field or value | Meaning |
+| --- | --- |
+| `browser_seconds` | Browser time |
+| `complete: true` | Browser time has been confirmed |
+| `complete: false` | Browser time is incomplete and may change |
+| `usage: null` | No snapshot is available |
+
+Usage confirmation is independent of test status.
+
+## Read billing
+
+| Field | Meaning |
+| --- | --- |
+| `status` | Billing state |
+| `amount_cents` | Amount in the reported currency's cents |
+| `currency` | Billing currency |
+| `credit_seconds_used` | Credit seconds consumed |
+| `invoice_url` | Invoice link, when available |
+
+Billing can settle after the test ends. Follow available minutes and billing state
+in the [dashboard](https://dash.browserbunny.dev).

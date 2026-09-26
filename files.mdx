@@ -3,7 +3,11 @@ title: "Upload files from URLs"
 description: "Provide file sources separately and describe the upload in ordinary language."
 ---
 
-Pass public HTTPS URLs in `files`, then explain which file to upload and where:
+## Supply upload sources
+
+1. Pass public HTTPS source URLs in `files`.
+2. Describe which file to upload and which webpage input to use.
+3. State whether to submit the form and what acceptance should look like.
 
 <CodeGroup>
 
@@ -56,34 +60,63 @@ console.log(test);
 
 </CodeGroup>
 
-Replace the example URLs with your test page and fixture. Supplying files does
-not itself authorize an upload. The agent uses your instructions to select a
-source for an observed webpage file input. It does not interpret file contents
-as documents or treat supplied sources as navigation destinations.
+Replace the example URLs with your test page and fixture.
+
+### How sources are used
+
+- **Upload permission:** your instructions authorize the upload; supplying a URL
+  alone does not.
+- **Destination:** the agent selects a source for an observed webpage file input.
+- **File contents:** files are not interpreted as documents or treated as
+  navigation destinations.
 
 ## File requirements
 
-Each URL must be public HTTPS and at most 2,000 characters. Credentials, private
-addresses, raw whitespace, control characters, backslashes, quote delimiters,
-and angle brackets are rejected. Percent-encoded values remain unchanged.
+| Requirement | Limit or behavior |
+| --- | --- |
+| Source URL | Public HTTPS; at most 2,000 characters |
+| File size | At most 10 MiB per file |
+| Download duration | At most 30 seconds |
+| Redirects | At most three |
+| Network access | Every connection must resolve to public addresses |
+| Authentication | Downloads do not use browser cookies or custom authorization |
 
-Downloads are limited to **10 MiB per file**, **30 seconds**, and **three redirects**.
-Every connection must resolve to public addresses. Keep URLs accessible until
-the upload step; downloads do not use browser cookies or custom authorization.
-Temporary files are removed after transfer or failure.
+Keep source URLs accessible until the upload step. Temporary files are removed
+after transfer or failure.
 
-File URLs retain their exact strings and list order. The authenticated test response
-returns the supplied list; derived reports and logs redact source URLs. Duplicate
-URLs remain in the list without adding upload actions. Omitting `files`, or
-supplying null or an empty list, means no separately supplied sources.
+### Rejected URL content
 
-## Verify the result
+- Embedded credentials or private addresses.
+- Raw whitespace or control characters.
+- Backslashes, quote delimiters, or angle brackets.
 
-For a requested submitted upload, the agent checks fresh rendered evidence of
-application acceptance after selecting the file and submitting. A populated input,
-click, or progress indicator alone cannot establish acceptance. A displayed
-rejection fails; missing or changing evidence is inconclusive.
+Percent-encoded values remain unchanged.
 
-An explicit file-selection-only request does not require submission. Application
-acceptance is evidence of the displayed result, not proof of server persistence.
-You can combine uploads with supported [network conditions](/conditions).
+### Storage and visibility
+
+- **Exact sources:** file URLs retain their strings and list order.
+- **Authenticated response:** the test response returns the supplied list.
+- **Reports and logs:** derived reports and logs redact source URLs.
+- **Duplicates:** duplicate URLs remain in the list without adding upload actions.
+- **No sources:** omit `files`, or supply `null` or an empty list.
+
+## Verify the upload
+
+For a submitted upload, the agent checks fresh rendered evidence after selecting
+the file and submitting the form.
+
+| Evidence | Result |
+| --- | --- |
+| Application displays acceptance | Supports the requested acceptance check |
+| Application displays rejection | The check fails |
+| Evidence is missing or changing | The result is inconclusive |
+| Only an input, click, or progress indicator is visible | Does not establish acceptance |
+
+### Verification boundaries
+
+- A file-selection-only request does not require submission.
+- Displayed acceptance does not prove server persistence.
+
+## Next step
+
+Combine uploads with supported [network conditions](/conditions).

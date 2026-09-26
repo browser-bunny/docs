@@ -5,20 +5,30 @@ description: "Handle submission errors and retry without creating duplicate test
 
 ## Retry a submission
 
-Use an optional `Idempotency-Key` on `POST /v1/tests`: 8–128 letters, numbers,
-periods, underscores, colons, or hyphens. Retain a stable key when you need to
-retry an uncertain submission.
+Use `Idempotency-Key` on `POST /v1/tests` when a submission may need to be retried.
 
-A new submission returns `202`. The same key and request return the existing test
-with `200`. Changing the starting URL, trimmed instructions, resolved environment
-selection, project, or nonempty file list with that key returns `409`. File order
-matters. An identical replay does not create another execution.
+### Key requirements
 
-Only retry an uncertain submission with its original key. Use a new key for a new test.
-The release selectors `latest` and `previous` can resolve to different installed
-versions over time; inspect `actual_environment` when comparing separate tests.
+- **Length:** 8–128 characters.
+- **Characters:** letters, numbers, periods, underscores, colons, or hyphens.
+- **Uncertain response:** retry with the original key and request body.
+- **New test:** use a new key.
 
-## HTTP errors
+### Submission responses
+
+| Request | Response |
+| --- | --- |
+| New submission | HTTP `202` |
+| Same key and request | HTTP `200` with the existing test; no new execution |
+| Same key with changed input | HTTP `409` |
+
+The replay comparison includes the starting URL, trimmed instructions, resolved
+environments, project, and nonempty file list. File order matters.
+
+**Release versions can change.** Separate tests using `latest` or `previous` can
+resolve to different installed versions. Compare `actual_environment` when reviewing results.
+
+## Handle request errors
 
 Application-generated errors have this structure:
 
@@ -33,49 +43,87 @@ Application-generated errors have this structure:
 }
 ```
 
-| Status | Typical cause | Action |
-| --- | --- | --- |
-| `401` | Missing or invalid API key | Use an active project key |
-| `402` | Test minutes or billing readiness required | Review account minutes and the error message |
-| `403` | Permission or origin rejected | Check credentials and request origin |
-| `404` | Test or execution not accessible in this project | Check the IDs and project key |
-| `409` | Idempotency conflict or minutes pending settlement | Restore original inputs or wait for settlement |
-| `422` | Invalid fields, URL, environment, or query | Correct the indicated request |
-| `429` | AWS account or service request throttling | Honor `Retry-After` when returned; back off before retrying |
-| `500` | An unexpected service error occurred | Keep `request_id`; retain the key when retrying submission |
-| `503` | A backing service is unavailable | Retry reads; retain the key when retrying submission |
+### Error details
 
-AWS API Gateway can reject authentication or throttle a request before it reaches
-the application. Those responses can use the gateway's own JSON shape, such as
-`{"message": "Unauthorized"}`, and may have no application `request_id` or `req_`
-identifier. Handle these errors by HTTP status when application-specific error
-fields are unavailable.
+| Field | Use |
+| --- | --- |
+| `code` | Identify the application error |
+| `message` | Read the error explanation |
+| `param` | Find the relevant parameter, when supplied |
+| `request_id` | Retain for support, when supplied |
 
-Keep `request_id` for support when present. A successful asynchronous submission can later
-finish with an execution error. Read `executions[].error`, conditions, and checks
-for that result; it is separate from an HTTP request error.
+### HTTP status codes
 
-## Current limits
+| Status | Cause and next action |
+| --- | --- |
+| `401` | Missing or invalid key. Use an active project key. |
+| `402` | Minutes or billing readiness required. Review account minutes and the error message. |
+| `403` | Permission or origin rejected. Check credentials and request origin. |
+| `404` | Test or execution is inaccessible. Check the IDs and project key. |
+| `409` | Idempotency conflict or minutes pending settlement. Restore original inputs or wait for settlement. |
+| `422` | Invalid input. Correct the indicated field, URL, environment, or query. |
+| `429` | AWS account or service throttling. Honor `Retry-After` when returned and back off. |
+| `500` | Unexpected service error. Retain `request_id` and the submission key before retrying. |
+| `503` | Backing service unavailable. Retry reads; retain the original key for submission retries. |
 
-| Setting | Current behavior |
+### Gateway errors
+
+AWS API Gateway can reject authentication or throttle a request before the
+application receives it.
+
+- **Response shape:** it may return `{"message": "Unauthorized"}`.
+- **Request identifier:** application `request_id` fields or `req_` identifiers may
+  be unavailable.
+- **Handling:** use the HTTP status when application error fields are missing.
+
+## Handle execution errors
+
+A successful submission can later finish with an execution error. Inspect:
+
+- `executions[].error` for its code and message.
+- `conditions` on the execution for setup and verification details.
+- `checks` on the execution for requested verification results.
+
+See [results](/results) to distinguish request errors, execution errors, and website failures.
+
+## Input limits
+
+| Input | Limit |
 | --- | --- |
 | `start_url` | 8–2,000 characters; public HTTPS without credentials or private addresses |
 | `instructions` | 5–3,000 characters; minimum also applies after trimming |
-| Browser planning | At most eight concise browser steps per test; split longer workflows into separate tests |
 | `environments` | Nonempty when supplied; distinct supported combinations after defaults |
-| Queue deadline | Up to six hours to start an execution |
-| Browser work | Nine minutes including browser startup, followed by cleanup and failure handling |
 | File source URL | At most 2,000 characters per URL |
+
+## Execution and transfer limits
+
+| Setting | Limit |
+| --- | --- |
+| Browser planning | At most eight concise browser steps per test |
+| Queue deadline | Up to six hours to start an execution |
+| Browser work | Nine minutes including startup, followed by cleanup and failure handling |
 | File transfer | 10 MiB, 30 seconds, up to three redirects per file |
-| Test page | 1–100 tests; default 50 |
-| Log page | 1–500 events; default 200 |
+
+### Plan workflows that fit
+
+- Character limits do not guarantee that every workflow fits the planner.
+- Browser steps and generated checks share a bounded plan.
+- Viewport sweeps can use several steps.
+- Split longer workflows into separate tests.
+
+## Pagination limits
+
+| Resource | Page size |
+| --- | --- |
+| Tests | 1–100; default 50 |
+| Logs | 1–500; default 200 |
 | Cursor | At most 2,048 characters; pass the returned value unchanged |
 
-The character limit does not guarantee that every workflow fits the planner.
-Steps and generated checks share a bounded execution plan; viewport sweeps can
-use several steps. Simplify or split requests that exceed that plan.
+## Queuing and billing readiness
 
-Accepted executions may queue while browser capacity is occupied. Available
-minutes, credit reservations, and settlement can also affect admission. Acceptance
-does not reserve an immediate browser start. Local polling timeouts can expire
-while the remote test is still queued. Retain the test ID to resume polling.
+- **Browser capacity:** accepted executions can queue while capacity is occupied.
+- **Account readiness:** available minutes, credit reservations, and settlement can
+  affect admission.
+- **Start time:** acceptance does not reserve an immediate browser start.
+- **Local timeouts:** polling can time out while the remote test remains queued.
+  Retain its ID to resume polling.

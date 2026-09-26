@@ -42,6 +42,13 @@ endpoint schemas. Use matching `cURL`, `Python`, and `JavaScript` labels in
 Keep prose and headings language-neutral; put client-specific setup and behavior
 inside the matching tab on `client-setup.mdx`. JSON response examples stay shared.
 
+Structure guides for mobile scanning: use task headings, numbered steps for
+workflows, labeled bullets for independent rules, and narrow tables for field or
+status definitions. Separate active and terminal statuses. Keep detailed client
+methods in an accordion and next actions in linked cards or a short list. Avoid
+paragraphs that combine status enums, field definitions, and unrelated caveats.
+Keep reference-page parameters and responses generated from OpenAPI.
+
 ## Release workflow
 
 1. In the backend checkout, run the backend and SDK tests, then generate:

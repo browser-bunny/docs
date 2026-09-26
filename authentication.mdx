@@ -3,13 +3,20 @@ title: "Authentication and projects"
 description: "Use a project API key to create tests and access their results."
 ---
 
-Select a project in the [dashboard](https://dash.browserbunny.dev), then create or
-copy one of its API keys. Every account has a **Default** project. The key determines
-where tests are created and which tests you can read, cancel, or inspect.
+## Create a project key
 
-Store the key in `BROWSERBUNNY_API_KEY` and send it as a bearer token on every
-`/v1` request. See [client setup](/client-setup) for prerequisites. Verify access
-by listing the available environments:
+1. Select a project in the [dashboard](https://dash.browserbunny.dev). Every account
+   starts with a **Default** project.
+2. Create or copy an API key for that project.
+3. Store it in `BROWSERBUNNY_API_KEY` in your server environment or CI secret store.
+
+The key determines where tests are created and which tests you can read, cancel,
+or inspect. See [client setup](/client-setup) for connection prerequisites.
+
+## Verify access
+
+Send the key as a bearer token on every `/v1` request. List environments to verify
+that the key works:
 
 <CodeGroup>
 
@@ -39,17 +46,22 @@ console.log(catalog);
 
 </CodeGroup>
 
-Keep keys in server-side environment variables or your CI secret store. Dashboard
-cookies do not authenticate `/v1` requests. Use a key from another project to switch
-projects; the create request does not accept `project_id`.
+## Choose an API environment
 
 | Environment | Base URL |
 | --- | --- |
 | Production | `https://api.browserbunny.dev` |
 | Staging | `https://api.staging.browserbunny.dev` |
 
-Use credentials issued in the same environment as the endpoint. Dashboard test and
-session URLs require sign-in to the owning account.
+Use a key issued in the same environment as the endpoint.
 
-An API key does not itself provide test minutes. Submission can be rejected when
-minutes are unavailable or reserved pending settlement. See [errors and limits](/errors-and-limits).
+## Understand access
+
+- **Project access:** use a different project's key to switch projects. The create
+  request does not accept `project_id`.
+- **API authentication:** dashboard cookies do not authenticate `/v1` requests.
+- **Dashboard links:** test and session URLs require sign-in to the owning account.
+- **Test minutes:** an API key does not provide minutes. Submission can be rejected
+  when minutes are unavailable or reserved pending settlement.
+
+See [errors and limits](/errors-and-limits) for rejected requests.

@@ -4,9 +4,12 @@ sidebarTitle: "Quickstart"
 description: "Create a browser test and follow its result."
 ---
 
-Create a project API key in the [dashboard](https://dash.browserbunny.dev) and
-make sure your account has test minutes. Complete [client setup](/client-setup)
-for your chosen language, then set your project key:
+## Before you start
+
+1. Create a project API key in the [dashboard](https://dash.browserbunny.dev).
+2. Make sure your account has test minutes.
+3. Complete [client setup](/client-setup) for your chosen language.
+4. Set your project key:
 
 ```bash
 export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
@@ -14,9 +17,13 @@ export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 
 ## Create a test
 
-Provide a public HTTPS `start_url` and explain what to do and verify in
-`instructions`. Omitting `environments` selects Windows desktop Chrome with the
-latest browser release available from AWS.
+| Input | What to provide |
+| --- | --- |
+| `start_url` | The public HTTPS page where the test starts |
+| `instructions` | What to do and what to verify |
+
+Omit `environments` to use Windows desktop Chrome with the latest release
+available from AWS.
 
 <CodeGroup>
 
@@ -63,13 +70,23 @@ console.log(test);
 
 </CodeGroup>
 
-The API returns HTTP `202` with a test whose ID starts with `test_`. It contains
-one `executions` entry for each selected environment. Save the test ID: creation
-returns before the browser work finishes.
+### Read the response
 
-The optional `Idempotency-Key` lets you retry a submission safely. Keep the same
-key and request body if the response is lost. An identical retry returns the
-existing test with HTTP `200`; changed input with the same key returns `409`.
+- **Accepted:** HTTP `202` means the test is ready for preparation.
+- **Test ID:** save the returned `id`, which starts with `test_`.
+- **Executions:** `executions` contains one entry per selected environment.
+
+**Acceptance is asynchronous.** The browser work finishes later. Unsupported
+instructions can produce an execution error before a browser is allocated.
+
+### Retry safely
+
+Keep the same `Idempotency-Key` and request body if the response is lost.
+
+| Retry | Response |
+| --- | --- |
+| Same key and input | HTTP `200` with the existing test |
+| Same key with changed input | HTTP `409` |
 
 ## Follow the test
 
@@ -105,15 +122,49 @@ console.log(test);
 
 Repeat this request about every two seconds until `status` is terminal.
 
-`status` is `queued`, `running`, or `cancelling` while work is active. The terminal
-statuses are `passed`, `failed`, `inconclusive`, `error`, and `cancelled`.
-`execution_counts.finished` tells you how many executions have finished.
+### While the test is active
 
-Open the returned `url` while signed in to see the test in the dashboard. Each
-execution also has a `session_url`, checks, and any preparation or execution error.
-A `202` means the request was accepted; unsupported instructions can still produce
-an execution error before a browser is allocated.
+| Status | Meaning |
+| --- | --- |
+| `queued` | Waiting to start |
+| `running` | Executing the test |
+| `cancelling` | Finishing cancellation and cleanup |
 
-Next, [select environments](/environments), [upload a file](/files), or describe
-[network and language conditions](/conditions). The [API reference](/api-reference/create-test)
-lists the request and response fields.
+### When the test is finished
+
+Stop polling when `status` is one of these terminal values:
+
+| Status | Meaning |
+| --- | --- |
+| `passed` | Requested checks passed |
+| `failed` | A requested check failed |
+| `inconclusive` | Available evidence could not establish the result |
+| `error` | Preparation or execution could not complete |
+| `cancelled` | The test was cancelled |
+
+### Inspect the result
+
+- **Completion count:** `execution_counts.finished` tells you how many executions
+  have finished.
+- **Dashboard:** open the returned `url` while signed in.
+- **Per-environment evidence:** inspect each execution's `checks`, `session_url`,
+  and `error`.
+
+For field details and mixed results, see [results, logs, and usage](/results).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Choose environments" icon="monitor" href="/environments">
+    Select the browsers and releases to test.
+  </Card>
+  <Card title="Upload files" icon="upload" href="/files">
+    Supply file URLs and describe the upload.
+  </Card>
+  <Card title="Set conditions" icon="settings" href="/conditions">
+    Describe network, locale, and timezone settings.
+  </Card>
+  <Card title="Explore the API" icon="code" href="/api-reference/create-test">
+    Read every request and response field.
+  </Card>
+</CardGroup>
