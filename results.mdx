@@ -221,6 +221,13 @@ console.log(page);
 
 Test-level events have `execution_id: null`.
 
+### Inspect network evidence
+
+Each execution has a `network` reference when evidence collection is initialized.
+Read its [request timeline](/network) to compare request outcomes and timings with
+the execution's actions and checks. Network activity events include a typed
+`data` object and expire after 14 days.
+
 ## Cancel and clean up
 
 <CodeGroup>

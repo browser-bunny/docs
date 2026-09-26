@@ -36,6 +36,7 @@
               "conditions",
               "files",
               "results",
+              "network",
               "errors-and-limits"
             ]
           }
@@ -57,7 +58,8 @@
               "api-reference/list-tests",
               "api-reference/get-test",
               "api-reference/cancel-test",
-              "api-reference/get-test-logs"
+              "api-reference/get-test-logs",
+              "api-reference/get-test-network"
             ]
           }
         ]

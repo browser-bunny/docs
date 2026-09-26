@@ -1,0 +1,148 @@
+---
+title: "Inspect network activity"
+description: "Read request outcomes and timings alongside actions, checks, and capture coverage."
+---
+
+Network evidence is collected automatically while an execution runs. Open its
+session page to inspect requests beside the recording, or retrieve the same
+evidence through the API.
+
+## Read an execution's requests
+
+Use the test ID and an execution ID from [Get a test](/api-reference/get-test).
+The execution's `network.url` also identifies this endpoint.
+
+<CodeGroup>
+
+```bash cURL
+curl --fail-with-body \
+  "https://api.browserbunny.dev/v1/tests/TEST_ID/executions/EXECUTION_ID/network?limit=200" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
+```
+
+```python Python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    page = client.tests.network("TEST_ID", "EXECUTION_ID", limit=200)
+    print(page)
+```
+
+```javascript JavaScript
+const response = await fetch(
+  "https://api.browserbunny.dev/v1/tests/TEST_ID/executions/EXECUTION_ID/network?limit=200",
+  { headers: { Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}` } }
+);
+const page = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(page));
+console.log(page);
+```
+
+</CodeGroup>
+
+Connected agents use `get_test_network` with the same IDs and filters.
+
+## Check coverage first
+
+The response separates capture coverage from evidence publication:
+
+| Field | Meaning |
+| --- | --- |
+| `capture.state` | Whether collection was partial, unsupported, disabled, or encountered an error |
+| `capture.status` | Whether evidence is processing, ready, unavailable, expired, or encountered a storage error |
+| `capture.adapter` | The browser event or page-timing collector used |
+| `capture.gaps` | Known missing contexts or collection failures |
+| `capture.counts` | Observed, retained, and dropped records |
+| `capture.counts_unknown` | Whether losses prevent exact counts |
+| `capture.expires_at` | When network evidence stops being readable |
+
+Current collectors report **partial** coverage. Browser event capture and page
+timing do not expose every device process, frame, worker, or persistent connection.
+An empty page does not prove that no requests failed.
+
+[List environments](/api-reference/list-environments) reports
+`capabilities.network_capture` for each browser. Inspect the execution's capture
+manifest for its actual coverage. Page-timing fallback covers entries still
+available in the current document; it cannot provide general request methods or
+a complete stream of transport failures.
+
+## Understand each request
+
+| Fields | What they tell you |
+| --- | --- |
+| `network_request_id`, `sequence` | Request identity and publication order within the execution |
+| `method`, `resource_type` | Request method and resource category, when observed |
+| `endpoint_id`, `host_id` | Protected identifiers for comparing requests within your project |
+| `status_code`, `outcome`, `error_category` | Received HTTP status and any observed transport failure |
+| `started_at`, `duration_ms` | Observed request start and duration |
+| `dns_ms`, `connect_ms`, `tls_ms`, `response_wait_ms`, `download_ms` | Timing phases when the collector exposes them |
+| `transfer_bytes`, `encoded_body_bytes`, `decoded_body_bytes` | Available transfer and response sizes |
+| `from_cache`, `from_service_worker` | Response source when observed |
+| `start_action_id`, `end_action_id`, `check_ids` | Related execution actions and checks |
+| `redirect_chain_id`, `redirect_hop`, `previous_request_id` | Observed redirect relationships |
+| `availability` | Reasons why individual values are unavailable |
+
+- **Unknown values:** `null` means unavailable. Use `availability` for the reason;
+  do not interpret missing values as zero or `false`.
+- **HTTP errors:** a received `503` can have `outcome: "completed"`. A transport
+  failure has `outcome: "transport_error"`. Network events do not independently
+  change the test result; requested checks determine that result.
+- **Pending requests:** `pending_at_capture_end` means collection ended before
+  the request finished. It does not establish a timeout.
+- **Action links:** associations are temporal. They do not prove that an action
+  caused a request. Match IDs to `execution.actions` and `execution.checks`.
+  Links remain empty when clock uncertainty prevents an unambiguous match;
+  `capture.clock_calibration` and `capture.clock_uncertainty_ms` describe this limit.
+- **Time offsets:** compare offsets only with the same `offset_origin` and
+  document/time origin. Timing phases can overlap; do not sum them blindly.
+- **Network conditions:** configured bandwidth and latency appear in execution
+  conditions. Request timing is an observation, not a measurement of cellular
+  signal, carrier speed, or round-trip latency.
+
+## Filter and follow requests
+
+| Query parameter | Filter |
+| --- | --- |
+| `method` | Exact method, such as `POST` |
+| `status_code` | Exact HTTP status, such as `503` |
+| `outcome` | Request outcome, such as `transport_error` |
+| `resource_type` | Category, such as `fetch` or `document` |
+| `min_duration_ms` | Requests with an observed duration at least this long |
+| `action_id` | Requests associated with that action at their start or end |
+
+1. Read a page. The default limit is 200; the maximum is 500. A response-size
+   budget can return fewer records.
+2. Pass `next_cursor` unchanged to read more existing records.
+3. When `next_cursor` is `null`, retain `cursor` to poll for newly published records.
+4. Keep the execution and filters unchanged while reusing a cursor. Start without
+   a cursor when changing a filter.
+
+Publication order follows completed records, so a long request may appear after
+a shorter request that began later. Use request timing to understand chronology.
+
+## Read activity summaries
+
+[Test logs](/api-reference/get-test-logs) include typed `network.capture`,
+`network.anomaly`, `network.action`, and `network.summary` events. Their `data`
+contains structured metadata and a `trace_url`; consumers do not need to parse
+the human-readable `message`.
+
+Anomaly examples and action summaries are bounded. Use the request trace and its
+coverage counts for detail.
+
+## Privacy and retention
+
+- **Protected URLs:** hosts and endpoints are project-scoped keyed identifiers.
+  Raw hosts, paths, query values, and fragments are not included.
+- **Excluded content:** request/response bodies, cookies, credentials, arbitrary
+  headers, and WebSocket message content are not collected into network evidence.
+- **Private access:** the same project API key or signed-in owner authorizes
+  network evidence. The trace endpoint does not return a public storage URL.
+- **Retention:** network evidence and its activity events expire after 14 days.
+  Expired evidence returns `capture.status: "expired"` and no request records.
+- **Capture budgets:** each execution retains up to 5,000 request records or
+  10 MiB of metadata, with room reserved for later anomalies. Inspect dropped
+  counts and truncation reasons. These are evidence budgets, not test capacity limits.
+
+Browser cleanup and test results remain independent of network-storage failures.
+Check both the test result and capture status when diagnosing an execution.

@@ -219,6 +219,366 @@
         "title": "Billing",
         "type": "object"
       },
+      "CaptureCounts": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes_retained": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Bytes Retained",
+            "type": "integer"
+          },
+          "dropped": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Dropped",
+            "type": "integer"
+          },
+          "emit_failures": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Emit Failures",
+            "type": "integer"
+          },
+          "events_dropped": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Events Dropped",
+            "type": "integer"
+          },
+          "events_observed": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Events Observed",
+            "type": "integer"
+          },
+          "inflight": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Inflight",
+            "type": "integer"
+          },
+          "observed": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Observed",
+            "type": "integer"
+          },
+          "retained": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Retained",
+            "type": "integer"
+          }
+        },
+        "title": "CaptureCounts",
+        "type": "object"
+      },
+      "CaptureLimits": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "default": 10485760,
+            "minimum": 0.0,
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "inflight": {
+            "default": 1000,
+            "minimum": 0.0,
+            "title": "Inflight",
+            "type": "integer"
+          },
+          "records": {
+            "default": 5000,
+            "minimum": 0.0,
+            "title": "Records",
+            "type": "integer"
+          },
+          "reserved_bytes": {
+            "default": 1048576,
+            "minimum": 0.0,
+            "title": "Reserved Bytes",
+            "type": "integer"
+          },
+          "reserved_records": {
+            "default": 500,
+            "minimum": 0.0,
+            "title": "Reserved Records",
+            "type": "integer"
+          }
+        },
+        "title": "CaptureLimits",
+        "type": "object"
+      },
+      "CaptureManifest": {
+        "additionalProperties": false,
+        "properties": {
+          "adapter": {
+            "anyOf": [
+              {
+                "pattern": "^[a-zA-Z0-9_.:-]{1,128}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adapter"
+          },
+          "adapter_version": {
+            "anyOf": [
+              {
+                "pattern": "^[a-zA-Z0-9_.:-]{1,128}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adapter Version"
+          },
+          "available_records": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Available Records",
+            "type": "integer"
+          },
+          "browser": {
+            "default": "unknown",
+            "enum": [
+              "chrome",
+              "edge",
+              "firefox",
+              "unknown"
+            ],
+            "title": "Browser",
+            "type": "string"
+          },
+          "clock_calibration": {
+            "default": "unavailable",
+            "enum": [
+              "observed",
+              "unavailable"
+            ],
+            "title": "Clock Calibration",
+            "type": "string"
+          },
+          "clock_uncertainty_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clock Uncertainty Ms"
+          },
+          "collector_duration_ms": {
+            "default": 0.0,
+            "minimum": 0.0,
+            "title": "Collector Duration Ms",
+            "type": "number"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/CaptureCounts"
+          },
+          "counts_unknown": {
+            "default": false,
+            "title": "Counts Unknown",
+            "type": "boolean"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "drain_count": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Drain Count",
+            "type": "integer"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "excluded_contexts": {
+            "items": {
+              "pattern": "^[a-zA-Z0-9_.:-]{1,128}$",
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Excluded Contexts",
+            "type": "array"
+          },
+          "execution_id": {
+            "pattern": "^exec_[a-f0-9]{24}$",
+            "title": "Execution Id",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "gaps": {
+            "items": {
+              "pattern": "^[a-zA-Z0-9_.:-]{1,128}$",
+              "type": "string"
+            },
+            "maxItems": 128,
+            "title": "Gaps",
+            "type": "array"
+          },
+          "included_contexts": {
+            "items": {
+              "pattern": "^[a-zA-Z0-9_.:-]{1,128}$",
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Included Contexts",
+            "type": "array"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/CaptureLimits"
+          },
+          "schema_version": {
+            "const": "network-v1",
+            "default": "network-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "state": {
+            "default": "partial",
+            "enum": [
+              "complete_within_scope",
+              "partial",
+              "unsupported",
+              "disabled",
+              "error"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "status": {
+            "default": "processing",
+            "enum": [
+              "processing",
+              "ready",
+              "error",
+              "expired",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/CaptureSummary"
+          },
+          "supported_fields": {
+            "items": {
+              "pattern": "^[a-zA-Z0-9_.:-]{1,128}$",
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Supported Fields",
+            "type": "array"
+          },
+          "truncation_reasons": {
+            "items": {
+              "pattern": "^[a-zA-Z0-9_.:-]{1,128}$",
+              "type": "string"
+            },
+            "maxItems": 128,
+            "title": "Truncation Reasons",
+            "type": "array"
+          },
+          "uploaded_records": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Uploaded Records",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "execution_id"
+        ],
+        "title": "CaptureManifest",
+        "type": "object"
+      },
+      "CaptureSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "outcomes": {
+            "additionalProperties": {
+              "minimum": 0.0,
+              "type": "integer"
+            },
+            "maxProperties": 5,
+            "propertyNames": {
+              "enum": [
+                "completed",
+                "transport_error",
+                "cancelled",
+                "pending_at_capture_end",
+                "unknown"
+              ]
+            },
+            "title": "Outcomes",
+            "type": "object"
+          },
+          "status_codes": {
+            "maxProperties": 500,
+            "patternProperties": {
+              "^[1-5][0-9]{2}$": {
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "title": "Status Codes",
+            "type": "object"
+          }
+        },
+        "title": "CaptureSummary",
+        "type": "object"
+      },
       "Check": {
         "additionalProperties": false,
         "properties": {
@@ -528,11 +888,15 @@
           "file_upload": {
             "title": "File Upload",
             "type": "boolean"
+          },
+          "network_capture": {
+            "$ref": "#/components/schemas/NetworkCaptureCapability"
           }
         },
         "required": [
           "file_upload",
-          "conditions"
+          "conditions",
+          "network_capture"
         ],
         "title": "EnvironmentCapabilities",
         "type": "object"
@@ -597,6 +961,14 @@
       "Execution": {
         "additionalProperties": false,
         "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionAction"
+            },
+            "maxItems": 1000,
+            "title": "Actions",
+            "type": "array"
+          },
           "actual_environment": {
             "anyOf": [
               {
@@ -656,6 +1028,16 @@
             "pattern": "^exec_[a-f0-9]{24}$",
             "title": "Id",
             "type": "string"
+          },
+          "network": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NetworkReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "phase": {
             "enum": [
@@ -745,6 +1127,70 @@
         "title": "Execution",
         "type": "object"
       },
+      "ExecutionAction": {
+        "additionalProperties": false,
+        "properties": {
+          "association": {
+            "const": "temporal",
+            "default": "temporal",
+            "title": "Association",
+            "type": "string"
+          },
+          "check_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9_-]{1,128}$",
+              "type": "string"
+            },
+            "maxItems": 128,
+            "title": "Check Ids",
+            "type": "array"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "id": {
+            "pattern": "^[A-Za-z0-9_-]{1,128}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "pattern": "^[A-Za-z0-9_-]{1,128}$",
+            "title": "Kind",
+            "type": "string"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "started_at"
+        ],
+        "title": "ExecutionAction",
+        "type": "object"
+      },
       "ExecutionCounts": {
         "additionalProperties": false,
         "properties": {
@@ -800,6 +1246,16 @@
       "Log": {
         "additionalProperties": false,
         "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NetworkEventData"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "execution_id": {
             "anyOf": [
               {
@@ -810,6 +1266,17 @@
               }
             ],
             "title": "Execution Id"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
           },
           "id": {
             "title": "Id",
@@ -835,6 +1302,23 @@
           "time": {
             "title": "Time",
             "type": "string"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "network.capture",
+                  "network.summary",
+                  "network.anomaly",
+                  "network.action"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
           }
         },
         "required": [
@@ -882,6 +1366,250 @@
           "cursor"
         ],
         "title": "LogPage",
+        "type": "object"
+      },
+      "NetworkCaptureCapability": {
+        "additionalProperties": false,
+        "properties": {
+          "adapter": {
+            "enum": [
+              "chrome_performance",
+              "edge_performance",
+              "resource_timing"
+            ],
+            "title": "Adapter",
+            "type": "string"
+          },
+          "coverage": {
+            "const": "partial",
+            "title": "Coverage",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "request_outcomes": {
+            "title": "Request Outcomes",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "adapter",
+          "coverage",
+          "request_outcomes",
+          "reason"
+        ],
+        "title": "NetworkCaptureCapability",
+        "type": "object"
+      },
+      "NetworkEventData": {
+        "additionalProperties": false,
+        "properties": {
+          "action_id": {
+            "anyOf": [
+              {
+                "pattern": "^action_[A-Za-z0-9_-]{1,80}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Id"
+          },
+          "check_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "title": "Check Ids",
+            "type": "array"
+          },
+          "counts": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counts"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "endpoint_id": {
+            "anyOf": [
+              {
+                "pattern": "^endpoint_[a-f0-9]{16,64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Endpoint Id"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "PATCH",
+                  "DELETE",
+                  "HEAD",
+                  "OPTIONS",
+                  "CONNECT",
+                  "TRACE",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method"
+          },
+          "network_request_id": {
+            "anyOf": [
+              {
+                "pattern": "^net_[A-Za-z0-9_-]{1,80}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Network Request Id"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "enum": [
+                  "completed",
+                  "transport_error",
+                  "cancelled",
+                  "pending_at_capture_end",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "enum": [
+                  "complete_within_scope",
+                  "partial",
+                  "unsupported",
+                  "disabled",
+                  "error",
+                  "pending",
+                  "expired"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "status_code": {
+            "anyOf": [
+              {
+                "maximum": 599.0,
+                "minimum": 100.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Code"
+          },
+          "trace_url": {
+            "pattern": "^/v1/tests/test_[a-f0-9]{24}/executions/exec_[a-f0-9]{24}/network$",
+            "title": "Trace Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "trace_url"
+        ],
+        "title": "NetworkEventData",
+        "type": "object"
+      },
+      "NetworkPage": {
+        "additionalProperties": false,
+        "properties": {
+          "capture": {
+            "$ref": "#/components/schemas/CaptureManifest"
+          },
+          "cursor": {
+            "title": "Cursor",
+            "type": "string"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/NetworkRequest"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "capture",
+          "data",
+          "next_cursor",
+          "cursor"
+        ],
+        "title": "NetworkPage",
         "type": "object"
       },
       "NetworkPreset": {
@@ -953,6 +1681,574 @@
           "reason"
         ],
         "title": "NetworkPreset",
+        "type": "object"
+      },
+      "NetworkReference": {
+        "additionalProperties": false,
+        "properties": {
+          "expires_at": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "status": {
+            "enum": [
+              "processing",
+              "ready",
+              "error",
+              "expired",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "url": {
+            "pattern": "^/v1/tests/test_[a-f0-9]{24}/executions/exec_[a-f0-9]{24}/network$",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "status"
+        ],
+        "title": "NetworkReference",
+        "type": "object"
+      },
+      "NetworkRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "association": {
+            "const": "temporal",
+            "default": "temporal",
+            "title": "Association",
+            "type": "string"
+          },
+          "availability": {
+            "maxProperties": 64,
+            "patternProperties": {
+              "^[a-zA-Z0-9_.:-]{1,128}$": {
+                "enum": [
+                  "unsupported",
+                  "not_observed",
+                  "cross_origin_restricted",
+                  "cache_or_cross_origin_ambiguous",
+                  "capture_gap",
+                  "not_applicable",
+                  "invalid_value"
+                ],
+                "type": "string"
+              }
+            },
+            "title": "Availability",
+            "type": "object"
+          },
+          "check_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9_-]{1,128}$",
+              "type": "string"
+            },
+            "maxItems": 128,
+            "title": "Check Ids",
+            "type": "array"
+          },
+          "connect_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connect Ms"
+          },
+          "decoded_body_bytes": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decoded Body Bytes"
+          },
+          "dns_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dns Ms"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "pattern": "^document_[a-f0-9]{24}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "download_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Download Ms"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          },
+          "encoded_body_bytes": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Encoded Body Bytes"
+          },
+          "end_action_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9_-]{1,128}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Action Id"
+          },
+          "end_offset_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Offset Ms"
+          },
+          "endpoint_id": {
+            "anyOf": [
+              {
+                "pattern": "^endpoint_[a-f0-9]{24}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Endpoint Id"
+          },
+          "error_category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "dns",
+                  "tls",
+                  "timeout",
+                  "connection",
+                  "cors",
+                  "blocked",
+                  "aborted",
+                  "unknown"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Category"
+          },
+          "execution_id": {
+            "pattern": "^exec_[a-f0-9]{24}$",
+            "title": "Execution Id",
+            "type": "string"
+          },
+          "frame_id": {
+            "anyOf": [
+              {
+                "pattern": "^frame_[a-f0-9]{24}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frame Id"
+          },
+          "from_cache": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Cache"
+          },
+          "from_service_worker": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Service Worker"
+          },
+          "host_id": {
+            "anyOf": [
+              {
+                "pattern": "^host_[a-f0-9]{24}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Host Id"
+          },
+          "initiator_type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "parser",
+                  "script",
+                  "preload",
+                  "preflight",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Initiator Type"
+          },
+          "key_version": {
+            "const": "v1",
+            "default": "v1",
+            "title": "Key Version",
+            "type": "string"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "PATCH",
+                  "DELETE",
+                  "HEAD",
+                  "OPTIONS",
+                  "CONNECT",
+                  "TRACE",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method"
+          },
+          "network_request_id": {
+            "pattern": "^net_[1-9][0-9]{0,9}$",
+            "title": "Network Request Id",
+            "type": "string"
+          },
+          "offset_origin": {
+            "anyOf": [
+              {
+                "enum": [
+                  "first_observed_browser_timestamp",
+                  "document_time_origin"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offset Origin"
+          },
+          "outcome": {
+            "enum": [
+              "completed",
+              "transport_error",
+              "cancelled",
+              "pending_at_capture_end",
+              "unknown"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "previous_request_id": {
+            "anyOf": [
+              {
+                "pattern": "^net_[1-9][0-9]{0,9}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Request Id"
+          },
+          "protocol": {
+            "anyOf": [
+              {
+                "enum": [
+                  "h2",
+                  "h3",
+                  "http/1.0",
+                  "http/1.1",
+                  "quic"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Protocol"
+          },
+          "redirect_chain_id": {
+            "anyOf": [
+              {
+                "pattern": "^chain_[a-f0-9]{24}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redirect Chain Id"
+          },
+          "redirect_hop": {
+            "anyOf": [
+              {
+                "maximum": 10000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redirect Hop"
+          },
+          "resource_type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "document",
+                  "stylesheet",
+                  "image",
+                  "media",
+                  "font",
+                  "script",
+                  "texttrack",
+                  "xhr",
+                  "fetch",
+                  "prefetch",
+                  "eventsource",
+                  "websocket",
+                  "manifest",
+                  "ping",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Type"
+          },
+          "response_wait_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response Wait Ms"
+          },
+          "schema_version": {
+            "const": "network-v1",
+            "default": "network-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "sequence": {
+            "minimum": 0.0,
+            "title": "Sequence",
+            "type": "integer"
+          },
+          "source": {
+            "const": "browser",
+            "default": "browser",
+            "title": "Source",
+            "type": "string"
+          },
+          "start_action_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9_-]{1,128}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Action Id"
+          },
+          "start_offset_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Offset Ms"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status_code": {
+            "anyOf": [
+              {
+                "maximum": 599.0,
+                "minimum": 100.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Code"
+          },
+          "time_origin_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Origin Ms"
+          },
+          "timing_source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "cdp_monotonic",
+                  "resource_timing"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timing Source"
+          },
+          "tls_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tls Ms"
+          },
+          "transfer_bytes": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transfer Bytes"
+          }
+        },
+        "required": [
+          "network_request_id",
+          "execution_id",
+          "sequence",
+          "outcome"
+        ],
+        "title": "NetworkRequest",
         "type": "object"
       },
       "Test": {
@@ -2263,6 +3559,372 @@
           }
         ],
         "summary": "Cancel a test",
+        "tags": [
+          "Tests"
+        ]
+      }
+    },
+    "/v1/tests/{test_id}/executions/{execution_id}/network": {
+      "get": {
+        "operationId": "getTestNetwork",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "test_id",
+            "required": true,
+            "schema": {
+              "title": "Test Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "execution_id",
+            "required": true,
+            "schema": {
+              "title": "Execution Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "method",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "GET",
+                    "POST",
+                    "PUT",
+                    "PATCH",
+                    "DELETE",
+                    "HEAD",
+                    "OPTIONS",
+                    "CONNECT",
+                    "TRACE",
+                    "OTHER"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Method"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status_code",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 599,
+                  "minimum": 100,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status Code"
+            }
+          },
+          {
+            "in": "query",
+            "name": "outcome",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "completed",
+                    "transport_error",
+                    "cancelled",
+                    "pending_at_capture_end",
+                    "unknown"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Outcome"
+            }
+          },
+          {
+            "in": "query",
+            "name": "resource_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "document",
+                    "stylesheet",
+                    "image",
+                    "media",
+                    "font",
+                    "script",
+                    "texttrack",
+                    "xhr",
+                    "fetch",
+                    "prefetch",
+                    "eventsource",
+                    "websocket",
+                    "manifest",
+                    "ping",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resource Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_duration_ms",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Duration Ms"
+            }
+          },
+          {
+            "in": "query",
+            "name": "action_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z0-9_-]{1,128}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Action Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 2048,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkPage"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing or invalid API key.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Permission denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "Resource not found in this project.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "Invalid request.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "AWS account or service request throttling.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "An unexpected error occurred.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "Service temporarily unavailable.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Read private execution network evidence",
         "tags": [
           "Tests"
         ]
