@@ -1,34 +1,31 @@
 ---
 title: "Authentication and projects"
-description: "Use a project API key to submit tests and access their results."
+description: "Use a project API key to create tests and access their results."
 ---
 
-Create an account and select a project in the [dashboard](https://dash.browserbunny.dev).
-Create or copy an API key from that project's API keys page. Every account has a
-**Default** project. A key belongs to one project; it determines where your tests
-are created and which tests you can retrieve, cancel, or inspect.
+Select a project in the [dashboard](https://dash.browserbunny.dev), then create or
+copy one of its API keys. Every account has a **Default** project. The key determines
+where tests are created and which tests you can read, cancel, or inspect.
 
 Send the key on every `/v1` request:
 
 ```bash
 export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
-curl --fail-with-body https://api.browserbunny.dev/v1/devices \
+curl --fail-with-body https://api.browserbunny.dev/v1/environments \
   -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 Keep keys in server-side environment variables or your CI secret store. Dashboard
-cookies do not authenticate `/v1` requests. To switch projects, use a key from the
-other project. The HTTP request does not accept `project_id`.
+cookies do not authenticate `/v1` requests. Use a key from another project to switch
+projects; the create request does not accept `project_id`.
 
 | Environment | Base URL |
 | --- | --- |
 | Production | `https://api.browserbunny.dev` |
 | Staging | `https://api.staging.browserbunny.dev` |
 
-Use credentials issued in the same environment as the endpoint. Run and session
-URLs point to the dashboard and require sign-in to the owning account.
+Use credentials issued in the same environment as the endpoint. Dashboard test and
+session URLs require sign-in to the owning account.
 
-Production currently uses administrator-granted test minutes. Card billing is
-disabled. A valid API key alone does not provide minutes; a submission can return
-`402` with `code: "minutes_required"` or `code: "minutes_pending"`.
-See [errors and limits](/errors-and-limits) for handling these responses.
+An API key does not itself provide test minutes. Submission can be rejected when
+minutes are unavailable or reserved pending settlement. See [errors and limits](/errors-and-limits).

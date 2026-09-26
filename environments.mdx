@@ -1,0 +1,61 @@
+---
+title: "Choose test environments"
+description: "Select Windows browsers and inspect their supported capabilities."
+---
+
+An environment names the device category, operating system, browser, and requested
+browser release. The same objects work in HTTP and Python. Each list entry creates
+one execution of your instructions.
+
+```json
+{
+  "start_url": "https://example.com",
+  "instructions": "Verify that the page heading is Example Domain.",
+  "environments": [
+    {"device": "desktop", "os": "windows", "browser": "chrome", "browser_version": "latest"},
+    {"device": "desktop", "os": "windows", "browser": "firefox", "browser_version": "previous"},
+    {"device": "desktop", "os": "windows", "browser": "edge", "browser_version": "latest"}
+  ]
+}
+```
+
+Windows desktop supports Chrome, Firefox, and Edge, each with `latest` and
+`previous`: six available combinations. Browsers start on demand in AWS Device Farm
+TestGrid and are released after execution.
+
+| Field | Values | Default |
+| --- | --- | --- |
+| `device` | `desktop` | `desktop` |
+| `os` | `windows` | `windows` |
+| `browser` | `chrome`, `firefox`, `edge` | `chrome` |
+| `browser_version` | `latest`, `previous` | `latest` |
+
+Omit `environments` to use one default environment. An explicit list must be
+nonempty and contain distinct combinations after defaults are applied. Invalid
+combinations are rejected without substituting another target.
+
+`latest` means the latest release AWS offers for that browser; `previous` means
+the preceding offered release. AWS manages the Windows version. The execution's
+`environment` records your selection, while `actual_environment` records the
+observed OS and installed browser versions after allocation. It is null until
+those details are available.
+
+## Discover capabilities
+
+```python
+catalog = client.environments.list()
+print(catalog["default"])
+for environment in catalog["data"]:
+    print(environment["browser"], environment["browser_version"], environment["capabilities"])
+```
+
+The HTTP endpoint is `GET /v1/environments`. Its `default` is the environment used
+when you omit selection; `data` contains available combinations and their
+capabilities. Copy the four selection fields into a create request, without the
+read-only `capabilities` object.
+
+`capabilities.file_upload` describes file-input upload support.
+`capabilities.conditions` describes condition support, whether it is enabled for
+the deployment, and any unavailable reason. Network, locale, and timezone
+conditions are supported on Chrome only and require verification in each session.
+Read [conditions](/conditions) before combining them with multiple browsers.

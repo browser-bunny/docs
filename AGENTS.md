@@ -4,9 +4,10 @@ This Mintlify site documents the production public API and Python SDK. Its sourc
 is this repository; `main` publishes to https://browserbunny.dev/docs.
 
 - Use active voice, second person, concise sentences, and sentence-case headings.
-- Use `instructions`, `start_url`, `devices`, and `files` for HTTP submissions.
+- Use `instructions`, `start_url`, `environments`, and `files` for HTTP submissions.
   Describe only the supported API; do not add compatibility aliases or old fields.
-- Keep SDK `platforms` selection separate from HTTP `devices` selection.
+- The SDK sends the same `environments` objects as HTTP. Describe one test with
+  one execution per environment, and one status field for both progress and result.
 - The backend owns OpenAPI. Regenerate `openapi/public-v1.json` using
   `../backend/scripts/export_public_openapi.py`; never hand-edit generated schemas.
 - Endpoint pages must reference the checked-in OpenAPI operation. Keep guides

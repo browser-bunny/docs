@@ -2,60 +2,156 @@
   "components": {
     "schemas": {
       "APIError": {
-        "additionalProperties": true,
+        "additionalProperties": false,
         "properties": {
-          "code": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Present for minutes_required and minutes_pending billing errors.",
-            "title": "Code"
-          },
-          "detail": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "items": {
-                  "additionalProperties": true,
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Service message or FastAPI validation errors.",
-            "title": "Detail"
-          },
-          "message": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "API Gateway authorization errors use message instead of detail.",
-            "title": "Message"
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
           }
         },
+        "required": [
+          "error"
+        ],
         "title": "APIError",
         "type": "object"
       },
+      "ActualEnvironment": {
+        "additionalProperties": false,
+        "properties": {
+          "browser": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Browser"
+          },
+          "browser_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Observed installed version, not the requested release selector.",
+            "title": "Browser Version"
+          },
+          "device": {
+            "title": "Device",
+            "type": "string"
+          },
+          "os": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Os"
+          },
+          "os_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Os Version"
+          }
+        },
+        "required": [
+          "device",
+          "os",
+          "os_version",
+          "browser",
+          "browser_version"
+        ],
+        "title": "ActualEnvironment",
+        "type": "object"
+      },
+      "Assertion": {
+        "additionalProperties": false,
+        "properties": {
+          "actual": {
+            "title": "Actual"
+          },
+          "expected": {
+            "title": "Expected"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "status"
+        ],
+        "title": "Assertion",
+        "type": "object"
+      },
+      "AvailableEnvironment": {
+        "additionalProperties": false,
+        "properties": {
+          "browser": {
+            "default": "chrome",
+            "description": "Browser family.",
+            "enum": [
+              "chrome",
+              "firefox",
+              "edge"
+            ],
+            "title": "Browser",
+            "type": "string"
+          },
+          "browser_version": {
+            "default": "latest",
+            "description": "Latest browser release available from AWS, or the preceding release.",
+            "enum": [
+              "latest",
+              "previous"
+            ],
+            "title": "Browser Version",
+            "type": "string"
+          },
+          "capabilities": {
+            "$ref": "#/components/schemas/EnvironmentCapabilities"
+          },
+          "device": {
+            "const": "desktop",
+            "default": "desktop",
+            "description": "Device category.",
+            "title": "Device",
+            "type": "string"
+          },
+          "os": {
+            "const": "windows",
+            "default": "windows",
+            "description": "Operating system. AWS manages its version.",
+            "title": "Os",
+            "type": "string"
+          }
+        },
+        "required": [
+          "capabilities"
+        ],
+        "title": "AvailableEnvironment",
+        "type": "object"
+      },
       "Billing": {
-        "additionalProperties": true,
+        "additionalProperties": false,
         "properties": {
           "amount_cents": {
             "anyOf": [
@@ -66,44 +162,7 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Amount Cents"
-          },
-          "amount_due_cents": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Amount Due Cents"
-          },
-          "amount_paid_cents": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Amount Paid Cents"
-          },
-          "balance_carried_cents": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Balance Carried Cents"
           },
           "credit_seconds_used": {
             "anyOf": [
@@ -114,7 +173,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Credit Seconds Used"
           },
           "currency": {
@@ -126,20 +184,7 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Currency"
-          },
-          "device_seconds": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Device Seconds"
           },
           "invoice_url": {
             "anyOf": [
@@ -150,32 +195,7 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Invoice Url"
-          },
-          "overage_seconds_waived": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Overage Seconds Waived"
-          },
-          "rate_cents_per_minute": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Rate Cents Per Minute"
           },
           "status": {
             "anyOf": [
@@ -186,45 +206,29 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Status"
-          },
-          "updated_at": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Updated At"
-          }
-        },
-        "title": "Billing",
-        "type": "object"
-      },
-      "Capabilities": {
-        "additionalProperties": true,
-        "properties": {
-          "conditions": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/ConditionCapability"
-            },
-            "title": "Conditions",
-            "type": "object"
           }
         },
         "required": [
-          "conditions"
+          "status",
+          "amount_cents",
+          "currency",
+          "credit_seconds_used",
+          "invoice_url"
         ],
-        "title": "Capabilities",
+        "title": "Billing",
         "type": "object"
       },
       "Check": {
-        "additionalProperties": true,
+        "additionalProperties": false,
         "properties": {
+          "assertions": {
+            "items": {
+              "$ref": "#/components/schemas/Assertion"
+            },
+            "title": "Assertions",
+            "type": "array"
+          },
           "coverage": {
             "anyOf": [
               {
@@ -235,7 +239,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Coverage"
           },
           "evidence": {
@@ -243,85 +246,17 @@
             "title": "Evidence",
             "type": "array"
           },
-          "files": {
-            "anyOf": [
-              {
-                "items": {
-                  "additionalProperties": true,
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Files"
-          },
-          "jev_calls": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Jev Calls"
+          "id": {
+            "title": "Id",
+            "type": "string"
           },
           "kind": {
             "title": "Kind",
             "type": "string"
           },
-          "latency_ms": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Latency Ms"
-          },
-          "locale": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Locale"
-          },
-          "provider": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Provider"
-          },
-          "scope": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Scope"
+          "name": {
+            "title": "Name",
+            "type": "string"
           },
           "status": {
             "title": "Status",
@@ -340,21 +275,21 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Verification Method"
           }
         },
         "required": [
+          "id",
+          "name",
           "kind",
           "status",
-          "summary",
-          "evidence"
+          "summary"
         ],
         "title": "Check",
         "type": "object"
       },
       "ConditionCapability": {
-        "additionalProperties": true,
+        "additionalProperties": false,
         "properties": {
           "enabled": {
             "title": "Enabled",
@@ -376,7 +311,6 @@
                 "type": "null"
               }
             ],
-            "default": null,
             "title": "Presets"
           },
           "reason": {
@@ -405,78 +339,8 @@
         "title": "ConditionCapability",
         "type": "object"
       },
-      "ConditionPlan": {
-        "additionalProperties": true,
-        "properties": {
-          "assumptions": {
-            "items": {},
-            "title": "Assumptions",
-            "type": "array"
-          },
-          "error": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Error"
-          },
-          "jev_calls": {
-            "title": "Jev Calls",
-            "type": "integer"
-          },
-          "latency_ms": {
-            "title": "Latency Ms",
-            "type": "number"
-          },
-          "model": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Model"
-          },
-          "requirements": {
-            "description": "Resolved test-wide requirements, each with kind, requested and resolved settings.",
-            "items": {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            "title": "Requirements",
-            "type": "array"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "version": {
-            "title": "Version",
-            "type": "string"
-          }
-        },
-        "required": [
-          "version",
-          "requirements",
-          "assumptions",
-          "status",
-          "latency_ms",
-          "jev_calls"
-        ],
-        "title": "ConditionPlan",
-        "type": "object"
-      },
       "ConditionReceipt": {
-        "additionalProperties": true,
+        "additionalProperties": false,
         "properties": {
           "applied": {
             "anyOf": [
@@ -492,7 +356,6 @@
           },
           "evidence": {
             "additionalProperties": true,
-            "description": "Readback evidence for this condition; network readback is configuration, not measured throughput.",
             "title": "Evidence",
             "type": "object"
           },
@@ -534,116 +397,179 @@
         "title": "ConditionReceipt",
         "type": "object"
       },
-      "Device": {
-        "additionalProperties": true,
+      "ConditionRequirement": {
+        "additionalProperties": false,
         "properties": {
-          "availability": {
-            "description": "Snapshot availability or ON_DEMAND; not a reservation or live capacity guarantee.",
-            "title": "Availability",
-            "type": "string"
-          },
-          "browser": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Browser"
-          },
-          "capabilities": {
-            "$ref": "#/components/schemas/Capabilities"
-          },
-          "company": {
-            "title": "Company",
-            "type": "string"
-          },
-          "enabled": {
-            "title": "Enabled",
-            "type": "boolean"
-          },
-          "form_factor": {
-            "title": "Form Factor",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
           "kind": {
-            "enum": [
-              "desktop",
-              "mobile"
-            ],
             "title": "Kind",
             "type": "string"
           },
-          "locked": {
-            "title": "Locked",
-            "type": "boolean"
+          "requested": {
+            "title": "Requested"
           },
-          "model_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Model Id"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "os": {
-            "description": "Windows for desktop; the catalog OS version for a mobile configuration.",
-            "title": "Os",
-            "type": "string"
-          },
-          "platform": {
-            "description": "Operating-system family, such as WINDOWS, IOS or ANDROID.",
-            "title": "Platform",
-            "type": "string"
-          },
-          "price_per_minute": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Price Per Minute"
+          "resolved": {
+            "additionalProperties": true,
+            "title": "Resolved",
+            "type": "object"
           }
         },
         "required": [
-          "id",
-          "company",
-          "name",
           "kind",
-          "platform",
-          "os",
-          "form_factor",
-          "availability",
-          "locked",
-          "enabled",
-          "price_per_minute",
-          "capabilities"
+          "requested",
+          "resolved"
         ],
-        "title": "Device",
+        "title": "ConditionRequirement",
         "type": "object"
       },
-      "DeviceResult": {
-        "additionalProperties": true,
+      "Conditions": {
+        "additionalProperties": false,
+        "properties": {
+          "assumptions": {
+            "items": {},
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionError"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "requirements": {
+            "items": {
+              "$ref": "#/components/schemas/ConditionRequirement"
+            },
+            "title": "Requirements",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "verification": {
+            "items": {
+              "$ref": "#/components/schemas/ConditionReceipt"
+            },
+            "title": "Verification",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "status",
+          "requirements",
+          "assumptions",
+          "verification"
+        ],
+        "title": "Conditions",
+        "type": "object"
+      },
+      "Environment": {
+        "additionalProperties": false,
+        "description": "A supported, on-demand AWS Device Farm desktop browser.",
         "properties": {
           "browser": {
+            "default": "chrome",
+            "description": "Browser family.",
+            "enum": [
+              "chrome",
+              "firefox",
+              "edge"
+            ],
+            "title": "Browser",
+            "type": "string"
+          },
+          "browser_version": {
+            "default": "latest",
+            "description": "Latest browser release available from AWS, or the preceding release.",
+            "enum": [
+              "latest",
+              "previous"
+            ],
+            "title": "Browser Version",
+            "type": "string"
+          },
+          "device": {
+            "const": "desktop",
+            "default": "desktop",
+            "description": "Device category.",
+            "title": "Device",
+            "type": "string"
+          },
+          "os": {
+            "const": "windows",
+            "default": "windows",
+            "description": "Operating system. AWS manages its version.",
+            "title": "Os",
+            "type": "string"
+          }
+        },
+        "title": "Environment",
+        "type": "object"
+      },
+      "EnvironmentCapabilities": {
+        "additionalProperties": false,
+        "properties": {
+          "conditions": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ConditionCapability"
+            },
+            "title": "Conditions",
+            "type": "object"
+          },
+          "file_upload": {
+            "title": "File Upload",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "file_upload",
+          "conditions"
+        ],
+        "title": "EnvironmentCapabilities",
+        "type": "object"
+      },
+      "EnvironmentsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AvailableEnvironment"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "default": {
+            "$ref": "#/components/schemas/Environment"
+          }
+        },
+        "required": [
+          "default",
+          "data"
+        ],
+        "title": "EnvironmentsResponse",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "param": {
             "anyOf": [
               {
                 "type": "string"
@@ -652,91 +578,68 @@
                 "type": "null"
               }
             ],
-            "title": "Browser"
+            "default": null,
+            "title": "Param"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "request_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "Execution": {
+        "additionalProperties": false,
+        "properties": {
+          "actual_environment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActualEnvironment"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "checks": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/Check"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Checks"
-          },
-          "condition_receipts": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/ConditionReceipt"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Condition Receipts"
+            "items": {
+              "$ref": "#/components/schemas/Check"
+            },
+            "title": "Checks",
+            "type": "array"
           },
           "conditions": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/ConditionPlan"
+                "$ref": "#/components/schemas/Conditions"
               },
               {
                 "type": "null"
               }
-            ],
-            "default": null
+            ]
           },
           "created_at": {
             "title": "Created At",
             "type": "string"
           },
-          "device": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Device"
-          },
-          "device_id": {
-            "title": "Device Id",
-            "type": "string"
+          "environment": {
+            "$ref": "#/components/schemas/Environment"
           },
           "error": {
             "anyOf": [
               {
-                "type": "string"
+                "$ref": "#/components/schemas/ExecutionError"
               },
               {
                 "type": "null"
               }
-            ],
-            "default": null,
-            "title": "Error"
-          },
-          "error_code": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Error Code"
+            ]
           },
           "finished_at": {
             "anyOf": [
@@ -750,43 +653,24 @@
             "title": "Finished At"
           },
           "id": {
-            "description": "Device test ID; pass this as test_id when filtering logs.",
+            "pattern": "^exec_[a-f0-9]{24}$",
             "title": "Id",
             "type": "string"
           },
-          "noul": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Agent assessment score; use status and checks for the test verdict.",
-            "title": "Noul"
-          },
-          "os": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Os"
-          },
-          "parent_id": {
-            "title": "Parent Id",
-            "type": "string"
-          },
           "phase": {
+            "enum": [
+              "queued",
+              "planning",
+              "starting",
+              "executing",
+              "checking",
+              "cleanup",
+              "finished"
+            ],
             "title": "Phase",
             "type": "string"
           },
           "session_url": {
-            "description": "Dashboard evidence URL; requires sign-in to the owning account.",
             "title": "Session Url",
             "type": "string"
           },
@@ -805,6 +689,7 @@
             "enum": [
               "queued",
               "running",
+              "cancelling",
               "passed",
               "failed",
               "inconclusive",
@@ -813,6 +698,17 @@
             ],
             "title": "Status",
             "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
           },
           "updated_at": {
             "title": "Updated At",
@@ -831,14 +727,14 @@
         },
         "required": [
           "id",
-          "device_id",
-          "device",
-          "os",
-          "browser",
+          "environment",
+          "actual_environment",
           "status",
           "phase",
-          "noul",
-          "parent_id",
+          "summary",
+          "error",
+          "checks",
+          "conditions",
           "session_url",
           "created_at",
           "updated_at",
@@ -846,83 +742,85 @@
           "finished_at",
           "usage"
         ],
-        "title": "DeviceResult",
+        "title": "Execution",
         "type": "object"
       },
-      "DeviceUsage": {
-        "additionalProperties": true,
+      "ExecutionCounts": {
+        "additionalProperties": false,
         "properties": {
-          "billed_minutes": {
-            "title": "Billed Minutes",
-            "type": "number"
-          },
-          "duration_seconds": {
-            "title": "Duration Seconds",
-            "type": "number"
-          },
-          "sessions": {
-            "title": "Sessions",
+          "finished": {
+            "title": "Finished",
             "type": "integer"
           },
-          "unconfirmed_sessions": {
-            "title": "Unconfirmed Sessions",
+          "total": {
+            "title": "Total",
             "type": "integer"
           }
         },
         "required": [
-          "duration_seconds",
-          "billed_minutes",
-          "sessions",
-          "unconfirmed_sessions"
+          "total",
+          "finished"
         ],
-        "title": "DeviceUsage",
+        "title": "ExecutionCounts",
         "type": "object"
       },
-      "Devices": {
-        "additionalProperties": true,
+      "ExecutionError": {
+        "additionalProperties": false,
         "properties": {
-          "checked_at": {
-            "title": "Checked At",
+          "code": {
+            "title": "Code",
             "type": "string"
           },
-          "default_device_id": {
-            "title": "Default Device Id",
-            "type": "string"
-          },
-          "devices": {
-            "items": {
-              "$ref": "#/components/schemas/Device"
-            },
-            "title": "Devices",
-            "type": "array"
-          },
-          "payments_enabled": {
-            "title": "Payments Enabled",
-            "type": "boolean"
-          },
-          "source": {
-            "title": "Source",
+          "message": {
+            "title": "Message",
             "type": "string"
           }
         },
         "required": [
-          "checked_at",
-          "source",
-          "payments_enabled",
-          "default_device_id",
-          "devices"
+          "code",
+          "message"
         ],
-        "title": "Devices",
+        "title": "ExecutionError",
+        "type": "object"
+      },
+      "GatewayError": {
+        "additionalProperties": false,
+        "description": "AWS API Gateway rejection before the application handles the request.",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "GatewayError",
         "type": "object"
       },
       "Log": {
-        "additionalProperties": true,
+        "additionalProperties": false,
         "properties": {
+          "execution_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Id"
+          },
           "id": {
             "title": "Id",
             "type": "string"
           },
           "level": {
+            "enum": [
+              "info",
+              "warn",
+              "error"
+            ],
             "title": "Level",
             "type": "string"
           },
@@ -934,17 +832,6 @@
             "title": "Phase",
             "type": "string"
           },
-          "test_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Test Id"
-          },
           "time": {
             "title": "Time",
             "type": "string"
@@ -953,7 +840,7 @@
         "required": [
           "id",
           "time",
-          "test_id",
+          "execution_id",
           "level",
           "phase",
           "message"
@@ -961,19 +848,19 @@
         "title": "Log",
         "type": "object"
       },
-      "Logs": {
-        "additionalProperties": true,
+      "LogPage": {
+        "additionalProperties": false,
         "properties": {
           "cursor": {
-            "description": "Watermark for polling future events, even when next_cursor is null.",
+            "description": "Watermark to retain when polling for future events.",
             "title": "Cursor",
             "type": "string"
           },
-          "logs": {
+          "data": {
             "items": {
               "$ref": "#/components/schemas/Log"
             },
-            "title": "Logs",
+            "title": "Data",
             "type": "array"
           },
           "next_cursor": {
@@ -985,20 +872,20 @@
                 "type": "null"
               }
             ],
-            "description": "Pass unchanged to fetch another existing page; null when caught up.",
+            "description": "Cursor for the next existing page; null when caught up.",
             "title": "Next Cursor"
           }
         },
         "required": [
-          "logs",
+          "data",
           "next_cursor",
           "cursor"
         ],
-        "title": "Logs",
+        "title": "LogPage",
         "type": "object"
       },
       "NetworkPreset": {
-        "additionalProperties": true,
+        "additionalProperties": false,
         "properties": {
           "download_kbps": {
             "title": "Download Kbps",
@@ -1068,29 +955,8 @@
         "title": "NetworkPreset",
         "type": "object"
       },
-      "Progress": {
-        "additionalProperties": true,
-        "properties": {
-          "completed": {
-            "description": "Number of device tests in a terminal state, including failures and cancellations.",
-            "title": "Completed",
-            "type": "integer"
-          },
-          "total": {
-            "description": "Number of selected device tests.",
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "total",
-          "completed"
-        ],
-        "title": "Progress",
-        "type": "object"
-      },
-      "Run": {
-        "additionalProperties": true,
+      "Test": {
+        "additionalProperties": false,
         "properties": {
           "billing": {
             "anyOf": [
@@ -1110,54 +976,43 @@
             "title": "Created At",
             "type": "string"
           },
+          "execution_counts": {
+            "$ref": "#/components/schemas/ExecutionCounts"
+          },
+          "executions": {
+            "items": {
+              "$ref": "#/components/schemas/Execution"
+            },
+            "title": "Executions",
+            "type": "array"
+          },
           "files": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "finished_at": {
             "anyOf": [
               {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "description": "Original source URLs, when supplied. Visible only to an authorized caller.",
-            "title": "Files"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "instructions": {
-            "title": "Instructions",
-            "type": "string"
-          },
-          "outcome": {
-            "anyOf": [
-              {
-                "enum": [
-                  "passed",
-                  "failed",
-                  "inconclusive",
-                  "error",
-                  "cancelled"
-                ],
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Outcome"
+            "description": "Non-null when all executions, including session cleanup, have finished.",
+            "title": "Finished At"
           },
-          "parent_id": {
-            "title": "Parent Id",
-            "type": "null"
+          "id": {
+            "pattern": "^test_[a-f0-9]{24}$",
+            "title": "Id",
+            "type": "string"
           },
-          "progress": {
-            "$ref": "#/components/schemas/Progress"
+          "instructions": {
+            "title": "Instructions",
+            "type": "string"
           },
           "project_id": {
             "title": "Project Id",
@@ -1167,32 +1022,43 @@
             "title": "Project Name",
             "type": "string"
           },
-          "results": {
-            "items": {
-              "$ref": "#/components/schemas/DeviceResult"
-            },
-            "title": "Results",
-            "type": "array"
-          },
-          "run_url": {
-            "title": "Run Url",
-            "type": "string"
-          },
           "start_url": {
             "title": "Start Url",
             "type": "string"
           },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
           "status": {
+            "description": "Terminal statuses are passed, failed, inconclusive, error and cancelled.",
             "enum": [
               "queued",
               "running",
-              "complete"
+              "cancelling",
+              "passed",
+              "failed",
+              "inconclusive",
+              "error",
+              "cancelled"
             ],
             "title": "Status",
             "type": "string"
           },
           "updated_at": {
             "title": "Updated At",
+            "type": "string"
+          },
+          "url": {
+            "description": "Dashboard URL for this test. Requires account sign-in.",
+            "title": "Url",
             "type": "string"
           },
           "usage": {
@@ -1208,44 +1074,66 @@
         },
         "required": [
           "id",
-          "status",
-          "outcome",
           "project_id",
           "project_name",
-          "parent_id",
+          "status",
           "start_url",
           "instructions",
-          "progress",
-          "results",
-          "run_url",
+          "files",
+          "executions",
+          "execution_counts",
           "created_at",
           "updated_at",
+          "started_at",
+          "finished_at",
           "cancel_requested",
+          "url",
           "usage",
           "billing"
         ],
-        "title": "Run",
+        "title": "Test",
+        "type": "object"
+      },
+      "TestPage": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Test"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "data",
+          "next_cursor"
+        ],
+        "title": "TestPage",
         "type": "object"
       },
       "TestRequest": {
         "additionalProperties": false,
         "properties": {
-          "devices": {
-            "anyOf": [
-              {
-                "const": "all",
-                "type": "string"
-              },
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              }
-            ],
-            "default": "all",
-            "description": "Exact enabled catalog IDs, or all for the account\u2019s enabled devices. At most eight unique targets; currently only desktop-chrome is unlocked.",
-            "title": "Devices"
+          "environments": {
+            "description": "One execution per environment. Defaults to Windows desktop, Chrome, latest. Discover supported choices with GET /v1/environments.",
+            "items": {
+              "$ref": "#/components/schemas/Environment"
+            },
+            "minItems": 1,
+            "title": "Environments",
+            "type": "array"
           },
           "files": {
             "anyOf": [
@@ -1287,72 +1175,23 @@
         "title": "TestRequest",
         "type": "object"
       },
-      "TokenUsage": {
-        "additionalProperties": true,
-        "properties": {
-          "cache_read_tokens": {
-            "title": "Cache Read Tokens",
-            "type": "integer"
-          },
-          "cache_write_tokens": {
-            "title": "Cache Write Tokens",
-            "type": "integer"
-          },
-          "input_tokens": {
-            "title": "Input Tokens",
-            "type": "integer"
-          },
-          "output_tokens": {
-            "title": "Output Tokens",
-            "type": "integer"
-          },
-          "requests": {
-            "title": "Requests",
-            "type": "integer"
-          },
-          "total_tokens": {
-            "title": "Total Tokens",
-            "type": "integer"
-          },
-          "unreported_requests": {
-            "title": "Unreported Requests",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "input_tokens",
-          "output_tokens",
-          "total_tokens",
-          "cache_read_tokens",
-          "cache_write_tokens",
-          "requests",
-          "unreported_requests"
-        ],
-        "title": "TokenUsage",
-        "type": "object"
-      },
       "Usage": {
-        "additionalProperties": true,
+        "additionalProperties": false,
         "properties": {
-          "bedrock": {
-            "$ref": "#/components/schemas/TokenUsage"
+          "browser_seconds": {
+            "description": "Observed total browser-session duration in seconds.",
+            "minimum": 0.0,
+            "title": "Browser Seconds",
+            "type": "number"
           },
           "complete": {
-            "description": "Whether all provider counters are confirmed. Independent of execution status.",
+            "description": "The browser-session duration has been confirmed. Independent of test status.",
             "title": "Complete",
             "type": "boolean"
-          },
-          "device_farm": {
-            "$ref": "#/components/schemas/DeviceUsage"
-          },
-          "jev": {
-            "$ref": "#/components/schemas/TokenUsage"
           }
         },
         "required": [
-          "bedrock",
-          "jev",
-          "device_farm",
+          "browser_seconds",
           "complete"
         ],
         "title": "Usage",
@@ -1361,45 +1200,92 @@
     },
     "securitySchemes": {
       "BearerAuth": {
-        "description": "Project API key from the dashboard. Cookies do not authenticate /v1 requests.",
+        "description": "Project API key. The key determines the account and project.",
         "scheme": "bearer",
         "type": "http"
       }
     }
   },
   "info": {
-    "description": "Public project-scoped browser-test API. Generated from the backend runtime contract.",
+    "description": "Natural-language browser tests with explicit environments and verified results.",
     "title": "BrowserBunny API",
     "version": "1.0.0"
   },
   "openapi": "3.1.0",
   "paths": {
-    "/v1/devices": {
+    "/v1/environments": {
       "get": {
-        "description": "Read the catalog snapshot and account-enabled targets. Only Windows Chrome is currently unlocked. Inspect capabilities.conditions for deployment support.",
-        "operationId": "listDevices",
+        "operationId": "listEnvironments",
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Devices"
+                  "$ref": "#/components/schemas/EnvironmentsResponse"
                 }
               }
             },
-            "description": "Success"
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "401": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/APIError"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
                 }
               }
             },
-            "description": "Missing or invalid API key."
+            "description": "Missing or invalid API key.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Permission denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
             "content": {
               "application/json": {
                 "schema": {
@@ -1407,7 +1293,15 @@
                 }
               }
             },
-            "description": "Gateway authorization or cross-origin request rejected."
+            "description": "Resource not found in this project.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "422": {
             "content": {
@@ -1417,7 +1311,58 @@
                 }
               }
             },
-            "description": "Invalid request."
+            "description": "Invalid request.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "AWS account or service request throttling.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "An unexpected error occurred.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "503": {
             "content": {
@@ -1427,7 +1372,15 @@
                 }
               }
             },
-            "description": "Service temporarily unavailable."
+            "description": "Service temporarily unavailable.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1435,27 +1388,245 @@
             "BearerAuth": []
           }
         ],
-        "summary": "List devices",
+        "summary": "List environments",
         "tags": [
-          "Devices"
+          "Environments"
         ]
       }
     },
-    "/v1/runs": {
-      "post": {
-        "description": "Submit instructions for asynchronous execution. A new request returns 202; an identical idempotent replay returns the current run with 200. Conditions are compiled in the worker before browser allocation; acceptance is not verification. The API key selects the project. Up to eight enabled targets; one active run service-wide; ten new submission attempts per account per UTC minute.",
-        "operationId": "createRun",
+    "/v1/tests": {
+      "get": {
+        "operationId": "listTests",
         "parameters": [
           {
-            "description": "Retain this key and the exact request when retrying an uncertain submission.",
-            "in": "header",
-            "name": "Idempotency-Key",
-            "required": true,
+            "in": "query",
+            "name": "cursor",
+            "required": false,
             "schema": {
-              "maxLength": 128,
-              "minLength": 8,
-              "pattern": "^[A-Za-z0-9_.:-]{8,128}$",
-              "type": "string"
+              "anyOf": [
+                {
+                  "maxLength": 2048,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestPage"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing or invalid API key.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Permission denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "Resource not found in this project.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "Invalid request.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "AWS account or service request throttling.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "An unexpected error occurred.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "Service temporarily unavailable.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "List tests",
+        "tags": [
+          "Tests"
+        ]
+      },
+      "post": {
+        "operationId": "createTest",
+        "parameters": [
+          {
+            "description": "Reuse this key and request body to retry a submission safely.",
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "minLength": 8,
+                  "pattern": "^[A-Za-z0-9_.:-]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Reuse this key and request body to retry a submission safely.",
+              "title": "Idempotency-Key"
             }
           }
         ],
@@ -1474,31 +1645,74 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Run"
+                  "$ref": "#/components/schemas/Test"
                 }
               }
             },
-            "description": "Existing run returned for an identical idempotent replay."
+            "description": "Idempotent replay",
+            "headers": {
+              "Location": {
+                "description": "URL of the accepted test.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "202": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Run"
+                  "$ref": "#/components/schemas/Test"
                 }
               }
             },
-            "description": "Accepted"
+            "description": "Successful Response",
+            "headers": {
+              "Location": {
+                "description": "URL of the accepted test.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "401": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/APIError"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
                 }
               }
             },
-            "description": "Missing or invalid API key."
+            "description": "Missing or invalid API key.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "402": {
             "content": {
@@ -1508,9 +1722,42 @@
                 }
               }
             },
-            "description": "Account minutes or billing readiness required, or selected environment is locked."
+            "description": "Test minutes are required.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Permission denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
             "content": {
               "application/json": {
                 "schema": {
@@ -1518,7 +1765,15 @@
                 }
               }
             },
-            "description": "Selected device is disabled for your account, or the gateway rejected authorization or origin."
+            "description": "Resource not found in this project.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "409": {
             "content": {
@@ -1528,7 +1783,15 @@
                 }
               }
             },
-            "description": "Idempotency key reused with different inputs, or minutes reserved by a previous run."
+            "description": "Idempotency conflict or minutes pending settlement.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "422": {
             "content": {
@@ -1538,22 +1801,55 @@
                 }
               }
             },
-            "description": "Invalid request."
+            "description": "Invalid request.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "429": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/APIError"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
                 }
               }
             },
-            "description": "Submission rate limit or an active browser run prevents admission.",
+            "description": "AWS account or service request throttling.",
             "headers": {
-              "Retry-After": {
-                "description": "Seconds to wait before retrying.",
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
                 "schema": {
-                  "type": "integer"
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "An unexpected error occurred.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -1566,7 +1862,15 @@
                 }
               }
             },
-            "description": "Service temporarily unavailable."
+            "description": "Service temporarily unavailable.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1574,23 +1878,22 @@
             "BearerAuth": []
           }
         ],
-        "summary": "Create a run",
+        "summary": "Create a test",
         "tags": [
-          "Runs"
+          "Tests"
         ]
       }
     },
-    "/v1/runs/{run_id}": {
+    "/v1/tests/{test_id}": {
       "get": {
-        "description": "Read a run in the API key\u2019s project. Wait for status complete, then inspect outcome and results.",
-        "operationId": "getRun",
+        "operationId": "getTest",
         "parameters": [
           {
             "in": "path",
-            "name": "run_id",
+            "name": "test_id",
             "required": true,
             "schema": {
-              "title": "Run Id",
+              "title": "Test Id",
               "type": "string"
             }
           }
@@ -1600,31 +1903,69 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Run"
+                  "$ref": "#/components/schemas/Test"
                 }
               }
             },
-            "description": "Success"
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "401": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/APIError"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
                 }
               }
             },
-            "description": "Missing or invalid API key."
+            "description": "Missing or invalid API key.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "403": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/APIError"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
                 }
               }
             },
-            "description": "Gateway authorization or cross-origin request rejected."
+            "description": "Permission denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "content": {
@@ -1634,7 +1975,15 @@
                 }
               }
             },
-            "description": "Run or device test not found in this project."
+            "description": "Resource not found in this project.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "422": {
             "content": {
@@ -1644,7 +1993,58 @@
                 }
               }
             },
-            "description": "Invalid request."
+            "description": "Invalid request.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "AWS account or service request throttling.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "An unexpected error occurred.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "503": {
             "content": {
@@ -1654,7 +2054,15 @@
                 }
               }
             },
-            "description": "Service temporarily unavailable."
+            "description": "Service temporarily unavailable.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1662,23 +2070,22 @@
             "BearerAuth": []
           }
         ],
-        "summary": "Get a run",
+        "summary": "Get a test",
         "tags": [
-          "Runs"
+          "Tests"
         ]
       }
     },
-    "/v1/runs/{run_id}/cancel": {
+    "/v1/tests/{test_id}/cancel": {
       "post": {
-        "description": "Request cooperative cancellation. Running devices must finish cleanup before the run completes. Already completed runs are returned unchanged.",
-        "operationId": "cancelRun",
+        "operationId": "cancelTest",
         "parameters": [
           {
             "in": "path",
-            "name": "run_id",
+            "name": "test_id",
             "required": true,
             "schema": {
-              "title": "Run Id",
+              "title": "Test Id",
               "type": "string"
             }
           }
@@ -1688,31 +2095,69 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Run"
+                  "$ref": "#/components/schemas/Test"
                 }
               }
             },
-            "description": "Success"
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "401": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/APIError"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
                 }
               }
             },
-            "description": "Missing or invalid API key."
+            "description": "Missing or invalid API key.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "403": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/APIError"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
                 }
               }
             },
-            "description": "Gateway authorization or cross-origin request rejected."
+            "description": "Permission denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "content": {
@@ -1722,7 +2167,15 @@
                 }
               }
             },
-            "description": "Run or device test not found in this project."
+            "description": "Resource not found in this project.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "422": {
             "content": {
@@ -1732,7 +2185,58 @@
                 }
               }
             },
-            "description": "Invalid request."
+            "description": "Invalid request.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "AWS account or service request throttling.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "An unexpected error occurred.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "503": {
             "content": {
@@ -1742,7 +2246,15 @@
                 }
               }
             },
-            "description": "Service temporarily unavailable."
+            "description": "Service temporarily unavailable.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1750,41 +2262,40 @@
             "BearerAuth": []
           }
         ],
-        "summary": "Cancel a run",
+        "summary": "Cancel a test",
         "tags": [
-          "Runs"
+          "Tests"
         ]
       }
     },
-    "/v1/runs/{run_id}/logs": {
+    "/v1/tests/{test_id}/logs": {
       "get": {
-        "description": "Read logs in ascending order. Filtering by test_id happens after pagination, so an empty page can still have next_cursor. Runs also return cursor as a watermark for polling future events.",
-        "operationId": "getRunLogs",
+        "operationId": "getTestLogs",
         "parameters": [
           {
             "in": "path",
-            "name": "run_id",
+            "name": "test_id",
             "required": true,
             "schema": {
-              "title": "Run Id",
+              "title": "Test Id",
               "type": "string"
             }
           },
           {
             "in": "query",
-            "name": "test_id",
+            "name": "execution_id",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "maxLength": 128,
+                  "pattern": "^exec_[a-f0-9]{24}$",
                   "type": "string"
                 },
                 {
                   "type": "null"
                 }
               ],
-              "title": "Test Id"
+              "title": "Execution Id"
             }
           },
           {
@@ -1822,31 +2333,69 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Logs"
+                  "$ref": "#/components/schemas/LogPage"
                 }
               }
             },
-            "description": "Success"
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "401": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/APIError"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
                 }
               }
             },
-            "description": "Missing or invalid API key."
+            "description": "Missing or invalid API key.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "403": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/APIError"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
                 }
               }
             },
-            "description": "Gateway authorization or cross-origin request rejected."
+            "description": "Permission denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "content": {
@@ -1856,7 +2405,15 @@
                 }
               }
             },
-            "description": "Run or device test not found in this project."
+            "description": "Resource not found in this project.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "422": {
             "content": {
@@ -1866,7 +2423,58 @@
                 }
               }
             },
-            "description": "Invalid request."
+            "description": "Invalid request.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "AWS account or service request throttling.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "An unexpected error occurred.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "503": {
             "content": {
@@ -1876,105 +2484,25 @@
                 }
               }
             },
-            "description": "Service temporarily unavailable."
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "summary": "Get run logs",
-        "tags": [
-          "Runs"
-        ]
-      }
-    },
-    "/v1/runs/{run_id}/usage": {
-      "get": {
-        "description": "Return the same run representation as Get a run, including aggregate usage and per-device results[].usage. Counters may still be incomplete after execution ends.",
-        "operationId": "getRunUsage",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "run_id",
-            "required": true,
-            "schema": {
-              "title": "Run Id",
-              "type": "string"
+            "description": "Service temporarily unavailable.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
             }
           }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Run"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError"
-                }
-              }
-            },
-            "description": "Missing or invalid API key."
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError"
-                }
-              }
-            },
-            "description": "Gateway authorization or cross-origin request rejected."
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError"
-                }
-              }
-            },
-            "description": "Run or device test not found in this project."
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError"
-                }
-              }
-            },
-            "description": "Invalid request."
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIError"
-                }
-              }
-            },
-            "description": "Service temporarily unavailable."
-          }
         },
         "security": [
           {
             "BearerAuth": []
           }
         ],
-        "summary": "Get run usage",
+        "summary": "Read test logs",
         "tags": [
-          "Runs"
+          "Tests"
         ]
       }
     }

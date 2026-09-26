@@ -1,83 +1,75 @@
 ---
 title: "Make your first API request"
 sidebarTitle: "Quickstart"
-description: "Connect to BrowserBunny and submit a browser test."
+description: "Create a browser test and follow its result."
 ---
 
-You need a BrowserBunny account, a project API key, available test minutes, and an enabled test target.
-Manage your keys in the [dashboard](https://dash.browserbunny.dev).
-
-## Connect to the API
-
-Keep your API key in an environment variable. Send it in the `Authorization`
-header with the `Bearer` prefix.
+Create a project API key in the [dashboard](https://dash.browserbunny.dev) and
+make sure your account has test minutes.
 
 ```bash
-export BROWSERBUNNY_API_KEY="YOUR_API_KEY"
+export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 ```
 
-Retrieve the device catalog:
+## Create a test
+
+Provide a public HTTPS `start_url` and explain what to do and verify in
+`instructions`. Omitting `environments` selects Windows desktop Chrome with the
+latest browser release available from AWS.
 
 ```bash
-curl --fail-with-body https://api.browserbunny.dev/v1/devices \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
-Choose a device from the response whose `enabled` value is `true` and whose
-`locked` value is `false`. Use its `id` in your run request.
-
-## Submit a test
-
-Windows Chrome (`desktop-chrome`) is currently enabled. Set `start_url` to your
-public HTTPS test site and describe what to do and verify in `instructions`.
-
-```bash
-curl --fail-with-body https://api.browserbunny.dev/v1/runs \
+curl --fail-with-body https://api.browserbunny.dev/v1/tests \
   -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: first-homepage-test-001" \
   --data '{
     "start_url": "https://example.com",
-    "instructions": "Verify that the homepage loads and has a page title.",
-    "devices": ["desktop-chrome"]
+    "instructions": "Verify that the page heading is Example Domain."
   }'
 ```
 
-A new run returns HTTP `202`. Save the `id` from the response to retrieve its
-progress. An identical idempotent replay returns `200`. Creating a run starts
-preparation and can consume account usage. Worker preparation can reject unsupported
-instructions before a browser is allocated.
+The API returns HTTP `202` with a test whose ID starts with `test_`. It contains
+one `executions` entry for each selected environment. Save the test ID: creation
+returns before the browser work finishes.
 
-<Note>
-  Keep the same idempotency key and request body when retrying an uncertain
-  submission. Use a new key for a new test. Reusing a key with a changed request
-  returns HTTP `409`.
-</Note>
+The optional `Idempotency-Key` lets you retry a submission safely. Keep the same
+key and request body if the response is lost. An identical retry returns the
+existing test with HTTP `200`; changed input with the same key returns `409`.
 
-## Follow the run
+## Follow the test
 
-Replace `RUN_ID` with the returned run ID:
+Replace `TEST_ID` with the returned ID:
 
 ```bash
-curl --fail-with-body https://api.browserbunny.dev/v1/runs/RUN_ID \
+curl --fail-with-body https://api.browserbunny.dev/v1/tests/TEST_ID \
   -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
-The run's `status` describes execution progress; `outcome` describes its result.
-A finished run has `status: "complete"`. Open the returned `run_url` while signed
-in to the owning account to review the run in your dashboard.
+`status` is `queued`, `running`, or `cancelling` while work is active. The terminal
+statuses are `passed`, `failed`, `inconclusive`, `error`, and `cancelled`.
+`execution_counts.finished` tells you how many executions have finished.
 
-Retrieve a page of logs:
+Open the returned `url` while signed in to see the test in the dashboard. Each
+execution also has a `session_url`, checks, and any preparation or execution error.
+A `202` means the request was accepted; unsupported instructions can still produce
+an execution error before a browser is allocated.
 
-```bash
-curl --fail-with-body 'https://api.browserbunny.dev/v1/runs/RUN_ID/logs?limit=200' \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
+## Use Python
+
+Install [SDK 0.7.0](/python-sdk), then create and wait explicitly:
+
+```python
+from browserbunny import BrowserBunny
+
+with BrowserBunny() as client:
+    test = client.tests.create(
+        start_url="https://example.com",
+        instructions='Verify that the page heading is "Example Domain".',
+    )
+    result = client.tests.wait(test["id"])
+    print(result["status"], result["url"])
 ```
 
-If `next_cursor` is non-null, pass that value unchanged as the `cursor` query
-parameter to retrieve the next page. Current runs also return a `cursor` watermark
-for polling future events. See [results and logs](/results).
-
-Next, try the [Python SDK](/python-sdk), [upload a file](/files), or describe
-[network and locale conditions](/conditions). The [API reference](/api-reference/create-run)
-lists every supported request field and response.
+Next, [select environments](/environments), [upload a file](/files), or describe
+[network and language conditions](/conditions). The [API reference](/api-reference/create-test)
+lists the request and response fields.

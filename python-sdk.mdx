@@ -1,86 +1,89 @@
 ---
 title: "Python SDK"
-description: "Install BrowserBunny 0.6.0 and create, follow, or cancel browser tests."
+description: "Install BrowserBunny 0.7.0 and create, follow, or cancel browser tests."
 ---
 
 Python 3.10 or newer is required. Install the hosted wheel:
 
 ```bash
-python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.6.0-py3-none-any.whl
+python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.7.0-py3-none-any.whl
 export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 ```
 
-The package is not published to PyPI. A bare `pip install browserbunny` is not the
-installation path for this SDK.
-
-## Run a test and wait
+## Create and wait
 
 ```python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
-    result = client.run(
+    test = client.tests.create(
         start_url="https://example.com",
-        instructions="Using a 3G connection, verify that the page heading is Example Domain.",
-        platforms=["windows"],
+        instructions='Using a 3G connection, verify the heading is "Example Domain".',
     )
-    print(result["outcome"], result["run_url"])
+    result = client.tests.wait(test["id"])
+    print(result["status"], result["url"])
+    for execution in result["executions"]:
+        print(execution["environment"], execution["status"], execution["checks"])
 ```
 
-`BrowserBunny(api_key=None, base_url=None, *, environment=None, timeout=30.0, transport=None)` reads
-`BROWSERBUNNY_API_KEY` when the key is omitted. Production is the default. Use
-`environment="staging"` or `BROWSERBUNNY_ENV=staging` for staging; `base_url` or
-`BROWSERBUNNY_BASE_URL` overrides the endpoint. Explicit arguments take priority.
-The constructor's `timeout` is the HTTP request timeout in seconds. `transport` accepts an HTTPX transport for custom transport or offline testing.
+`create()` returns after acceptance. `wait()` polls until the test is terminal.
+Omitting `environments` selects Windows desktop Chrome, latest release. The SDK
+sends the same [environment objects](/environments) as HTTP. The service resolves
+and validates them; the SDK does not rewrite instructions or download files.
 
-## Start now, follow later
+## Methods
 
-```python
-from browserbunny import BrowserBunny
-
-with BrowserBunny() as client:
-    run = client.runs.create(
-        start_url="https://example.com",
-        instructions="Verify that the page heading is Example Domain.",
-        platforms=["windows"],
-        idempotency_key="ci-homepage-001",
-    )
-    print(run["id"], run["run_url"])
-    result = client.runs.wait(run["id"], timeout=900, poll_interval=2)
-    print(result["outcome"])
-```
-
-| Method | Arguments and behavior |
+| Method | Behavior |
 | --- | --- |
-| `client.devices.list()` | Return the catalog and account availability |
-| `client.run(start_url, instructions, platforms, *, files=None, idempotency_key=None, timeout=900, poll_interval=2)` | Resolve platforms, submit, and wait |
-| `client.runs.create(start_url, instructions, devices=None, *, platforms=None, files=None, idempotency_key=None)` | Submit and return immediately; omitting selectors uses your account’s enabled configurations |
-| `client.runs.get(run_id)` | Return current lifecycle, verdict, results, and usage |
-| `client.runs.wait(run_id, timeout=900, poll_interval=2, *, terminal_statuses=None)` | Poll until the parent finishes |
-| `client.runs.logs(run_id, test_id=None, cursor=None, limit=200)` | Return a single log page |
-| `client.runs.cancel(run_id)` | Request cooperative cancellation |
-| `client.close()` | Close HTTP connections; the context manager calls this automatically |
+| `client.environments.list()` | Return available environments and capabilities |
+| `client.tests.create(start_url, instructions, *, environments=None, files=None, idempotency_key=None)` | Create and return an accepted test |
+| `client.tests.get(test_id)` | Read status, executions, checks, usage, and billing |
+| `client.tests.list(*, cursor=None, limit=50)` | Return a project test page with `data` and `next_cursor` |
+| `client.tests.wait(test_id, *, timeout=900, poll_interval=2)` | Poll until a terminal status |
+| `client.tests.logs(test_id, *, execution_id=None, cursor=None, limit=200)` | Return a log page with `data`, `cursor`, and `next_cursor` |
+| `client.tests.cancel(test_id)` | Request cooperative cancellation |
+| `client.close()` | Close the client's HTTP connections |
 
-Use either `platforms` or `devices` in `runs.create()`. OS-based platform selection
-is an SDK convenience, resolved into the HTTP `devices` field. See
-[environment selection](/devices) and [file uploads](/files).
+Responses are dictionaries with type hints. The API key selects the project.
+Use the context manager to close HTTP connections automatically.
 
-Responses are dictionaries, including additional server fields. Read usage from
-`client.runs.get(run_id)`.
-The API key sets the project; neither submission method accepts `project_id`.
+For a CI job, pass your own stable `idempotency_key`. Repeat the same request with
+that key after an uncertain submission. The SDK generates a fresh key when omitted
+and never retries POST requests automatically.
 
-## Timeouts and exceptions
+## Timeouts and errors
 
-The `timeout` on `run()` and `wait()` controls your local wait, not the remote test
-lifetime. On `RunTimeoutError`, use `.run_id` and `.last_run` to resume later.
-Timeouts and closing the client do not cancel a run. `terminal_statuses` overrides
-the set of parent states that ends polling; its default is `{"complete"}`.
+The `timeout` on `wait()` limits local polling. It does not change the remote
+execution or queue deadlines. On `TestTimeoutError`, retain `.test_id` and
+`.last_test` to resume later. Closing the client does not cancel remote work.
 
-SDK exceptions inherit from `BrowserBunnyError`: `ConfigurationError`,
-`AuthenticationError`, `BillingError`, `RateLimitError`, `TransportError`,
-`APIError`, `UnsupportedOperationError`, and `RunTimeoutError`. HTTP errors expose
-`status_code` and a sanitized `request_id`. Invalid selector values raise
-`ValueError`. Locked or unsupported requested platforms raise
-`UnsupportedOperationError` before submission.
+```python
+from browserbunny import APIError, TestTimeoutError
 
-No automatic POST retry occurs. See [idempotency and errors](/errors-and-limits).
+try:
+    result = client.tests.wait(test["id"])
+except TestTimeoutError as error:
+    print("Still pending:", error.test_id)
+except APIError as error:
+    print(error.code, error.message, error.param, error.request_id)
+```
+
+HTTP exceptions include `AuthenticationError`, `ValidationError`, `BillingError`,
+`RateLimitError`, and `UnsupportedOperationError`. They expose `status_code`,
+`code`, `message`, `param`, `request_id`, and `retry_after` when available.
+`TransportError` means a request could not be completed and its remote result
+may be unknown. `ConfigurationError` covers client configuration. All SDK errors
+inherit from `BrowserBunnyError`; invalid local argument shapes can raise `ValueError`.
+
+## Configure the connection
+
+```python
+client = BrowserBunny(api_key="YOUR_PROJECT_API_KEY", timeout=30)
+staging = BrowserBunny(environment="staging")
+```
+
+The constructor reads `BROWSERBUNNY_API_KEY`, `BROWSERBUNNY_ENV`, and
+`BROWSERBUNNY_BASE_URL` when their arguments are omitted. Production is the default.
+An explicit `base_url` overrides the environment's hosted URL; explicit arguments
+have priority over environment variables. The constructor's `timeout` is the
+HTTP request timeout, in seconds.

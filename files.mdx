@@ -3,63 +3,54 @@ title: "Upload files from URLs"
 description: "Provide file sources separately and describe the upload in ordinary language."
 ---
 
-Pass `files` as a list of public HTTPS URLs, then describe which file to upload and
-where. No alias or `@` syntax is required.
+Pass public HTTPS URLs in `files`, then explain which file to upload and where:
 
 ```python
-run = client.runs.create(
+test = client.tests.create(
     start_url="https://example.com/upload",
     instructions="Upload the invoice PDF into Attachment, click Upload, and verify acceptance.",
     files=["https://files.example.com/invoice.pdf"],
-    platforms=["windows"],
 )
 ```
 
-The same HTTP request body is:
+The HTTP body uses the same fields:
 
 ```json
 {
   "start_url": "https://example.com/upload",
   "instructions": "Upload the invoice PDF into Attachment, click Upload, and verify acceptance.",
-  "files": ["https://files.example.com/invoice.pdf"],
-  "devices": ["desktop-chrome"]
+  "files": ["https://files.example.com/invoice.pdf"]
 }
 ```
 
-Replace the example URLs with your test page and downloadable fixture. Supplying
-a URL does not automatically upload it: your instructions authorize the upload,
-and the agent selects the source for an observed webpage file input. File contents
-are not interpreted as documents. Desktop Chrome is the supported target.
+Replace the example URLs with your test page and fixture. Supplying files does
+not itself authorize an upload. The agent uses your instructions to select a
+source for an observed webpage file input. It does not interpret file contents
+as documents or treat supplied sources as navigation destinations.
 
 ## File requirements
 
 Each URL must be public HTTPS and at most 2,000 characters. Credentials, private
-addresses, raw whitespace, controls, backslashes, quote delimiters, and angle
-brackets are rejected. Percent-encoded values remain unchanged.
+addresses, raw whitespace, control characters, backslashes, quote delimiters,
+and angle brackets are rejected. Percent-encoded values remain unchanged.
 
-The file list has no separate count limit. Downloads are limited to **10 MiB per
-file**, **30 seconds**, and **three redirects**. Every connection must resolve to
-public addresses. Use a URL that stays accessible until the agent reaches the
-upload step; no browser cookies or custom download authorization are supplied.
-Downloads happen during execution, not when you submit the run. Temporary files
-are removed after transfer or failure.
+Downloads are limited to **10 MiB per file**, **30 seconds**, and **three redirects**.
+Every connection must resolve to public addresses. Keep URLs accessible until
+the upload step; downloads do not use browser cookies or custom authorization.
+Temporary files are removed after transfer or failure.
 
-The SDK preserves exact URL strings and list order. The run response returns the
-original list to authenticated callers; execution reports and logs redact source
-URLs. Changing the list or its order changes idempotency matching. An omitted,
-null, or empty list means no separately supplied sources.
+The SDK preserves exact strings and list order. The authenticated test response
+returns the supplied list; derived reports and logs redact source URLs. Duplicate
+URLs remain in the list without adding upload actions. Omitting `files`, or
+supplying null or an empty list, means no separately supplied sources.
 
-An exact quoted URL in instructions also remains supported, such as
-`Upload "https://files.example.com/invoice.pdf" into Attachment`.
-The separate `files` field keeps URLs out of the 3,000-character instructions budget.
+## Verify the result
 
-## What passing an upload means
-
-The agent first verifies selection in the file input. For a requested submitted
-upload, it separately checks fresh rendered evidence of application acceptance.
-A click, populated input, or upload progress alone cannot pass that check. A shown
+For a requested submitted upload, the agent checks fresh rendered evidence of
+application acceptance after selecting the file and submitting. A populated input,
+click, or progress indicator alone cannot establish acceptance. A displayed
 rejection fails; missing or changing evidence is inconclusive.
 
 An explicit file-selection-only request does not require submission. Application
 acceptance is evidence of the displayed result, not proof of server persistence.
-You can combine uploads with the supported [network conditions](/conditions).
+You can combine uploads with supported [network conditions](/conditions).

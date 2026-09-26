@@ -1,39 +1,39 @@
 ---
 title: "Browser tests, in your words."
 sidebarTitle: "Introduction"
-description: "Describe a user journey. Run it with BrowserBunny. Understand what happened."
+description: "Describe a user journey. Test it in real browsers and review the evidence."
 ---
 
 <div className="bb-kicker">BROWSERBUNNY DOCUMENTATION</div>
 
 <p className="bb-intro">
-  Give BrowserBunny a URL and a task in plain language. Start a browser test
-  through the API or Python SDK, follow its progress, and review the evidence
-  from your dashboard.
+  Give BrowserBunny a starting URL and instructions in ordinary language.
+  Submit a test through the API or Python SDK, follow each browser execution,
+  and review its checks and session evidence.
 </p>
 
 <CardGroup cols={2}>
   <Card title="Make your first API request" icon="terminal" href="/quickstart" className="bb-card">
-    Connect with an API key, choose an available device, and submit a test.
+    Submit a test with your project API key. Windows Chrome is the default.
   </Card>
   <Card title="Explore your dashboard" icon="monitor-play" href="https://dash.browserbunny.dev" className="bb-card">
-    Manage API keys and review your runs, activity, and session recordings.
+    Manage project keys and review tests, usage, and session recordings.
   </Card>
 </CardGroup>
 
-## From a task to a result
+## From instructions to evidence
 
 <Steps>
-  <Step title="Describe the journey">
-    Choose a starting URL and explain what you want to check. Use the same
-    language you would use to walk a teammate through the experience.
+  <Step title="Describe what to do and verify">
+    Write the journey as you would explain it to a teammate. Include supported
+    conditions such as a 3G connection or Spanish browser language in the instructions.
   </Step>
-  <Step title="Choose where to run">
-    Retrieve the device catalog and select a target enabled for your account.
-    Availability comes from the API, so your request uses supported targets.
+  <Step title="Choose the browsers">
+    Use the default environment or select Windows Chrome, Firefox, and Edge.
+    Each environment gets its own execution of the same instructions.
   </Step>
-  <Step title="Review the evidence">
-    Follow the run's status and logs. Open your dashboard to inspect the outcome
-    and session evidence.
+  <Step title="Read the result">
+    Follow the test until it finishes. Inspect each execution's status, checks,
+    and session evidence to understand what happened.
   </Step>
 </Steps>

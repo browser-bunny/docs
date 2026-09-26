@@ -25,10 +25,10 @@ and assets in sync with the application when the brand changes.
 
 ## Public API reference
 
-The backend owns the six public operations and all request/response schemas in
-`dash/agent/openapi.py`. It derives paths, query parameters, and request models
-from the registered runtime routes. Exporting fails if an operation is missing
-from the contract. Backend tests validate real service responses against it.
+The backend owns the six public operations and their request/response schemas.
+`dash/agent/openapi.py` exports the registered routes and runtime response models.
+The export includes paths, query parameters, request models, and response models.
+Backend tests validate real service responses against it.
 
 The public production snapshot is served at
 `https://api.browserbunny.dev/openapi/public-v1.json`. This excludes dashboard and
@@ -58,3 +58,8 @@ before merging its corresponding docs update, so the production comparison passe
 This is a coordinated release check; backend changes do not automatically commit
 or publish documentation. Keep the checked-in schema immutable between reviewed
 updates and regenerate it rather than editing JSON by hand.
+
+`api-release.json` records the backend bundle and generated schema for this
+revision. Publish only after the matching production deployment and a successful
+`check-api` comparison. Local verification uses the backend exporter with
+`--check`, `mint validate`, and `mint broken-links`.

@@ -1,84 +1,93 @@
 ---
 title: "Results, logs, and usage"
-description: "Distinguish execution state, test verdicts, evidence, and accounting."
+description: "Follow test status and inspect evidence from each browser execution."
 ---
 
-A submitted test is represented by a parent **run** with one child result per
-selected device. The current resource and Python namespace are `/v1/runs` and
-`client.runs`.
+A **test** contains your instructions and one **execution** per selected environment.
+Test IDs begin with `test_`; execution IDs begin with `exec_`.
 
-## Wait for completion
+## Follow status
 
-Call `GET /v1/runs/{run_id}` or `client.runs.get(run_id)` to inspect the current run.
-`client.runs.wait(run_id)` polls until execution completes.
+Read `GET /v1/tests/{test_id}` or `client.tests.get(test_id)`.
+`client.tests.wait(test_id)` polls until the test is terminal.
 
-| Field | Meaning |
+| Status | Meaning |
 | --- | --- |
-| `status` | Parent lifecycle: `queued`, `running`, or `complete` |
-| `outcome` | Aggregate verdict, initially null |
-| `progress.total` | Number of selected device tests |
-| `progress.completed` | Number in a terminal state, including errors and cancellations |
-| `results` | Per-device execution results |
-| `cancel_requested` | Whether cooperative cancellation was requested |
-| `run_url` | Dashboard page for the run |
+| `queued` | Accepted and waiting to start |
+| `running` | Execution is in progress |
+| `cancelling` | Cancellation is requested; work and cleanup are finishing |
+| `passed` | Requested checks passed |
+| `failed` | A requested check failed |
+| `inconclusive` | Available evidence could not establish the result |
+| `error` | Preparation or execution could not complete |
+| `cancelled` | The test was cancelled |
+
+The last five statuses are terminal. Test status becomes terminal after every
+execution finishes, including browser cleanup. For mixed results, the aggregate
+uses the precedence `error`, `failed`, `cancelled`, `inconclusive`, then `passed`.
+Inspect executions to see each environment's result.
+
+| Test field | Meaning |
+| --- | --- |
+| `execution_counts.total` | Number of executions |
+| `execution_counts.finished` | Number finished, including failures and cancellations |
+| `executions` | Per-environment status, checks, conditions, and evidence links |
+| `url` | Dashboard page for the test |
+| `start_url`, `instructions`, `files` | Submitted inputs; surrounding instruction whitespace is trimmed when stored |
 | `project_id`, `project_name` | Project selected by the API key |
-| `start_url`, `instructions`, `files` | Submitted inputs; instructions are stored after trimming surrounding whitespace |
-| `usage`, `billing` | Recorded accounting information, when available |
+| `started_at`, `finished_at` | Execution timing; null before applicable |
+| `usage`, `billing` | Accounting snapshots, when available |
 
-A parent with `status: "complete"` has finished; inspect `outcome` to decide what
-happened. Outcomes are `passed`, `failed`, `inconclusive`, `error`, or `cancelled`.
-For mixed device results, the aggregate uses this precedence: `error`, `failed`,
-`cancelled`, `inconclusive`, then `passed`.
+Each execution records the requested `environment`, observed `actual_environment`,
+`status`, `phase`, timestamps, and `session_url`. Its `error` is either null or an
+object with `code` and `message`. Preparation can fail before any browser exists.
+`phase` is `queued`, `planning`, `starting`, `executing`, `checking`, `cleanup`, or
+`finished`; it describes the current stage separately from the result status.
 
-Each child has an `id` beginning with `test_`, device information, a `phase`, and a
-`status`. The child's `status` combines lifecycle and verdict: `queued`, `running`,
-`passed`, `failed`, `inconclusive`, `error`, or `cancelled`. Children do not have a
-separate `outcome` field. `noul` is an agent assessment score, not a substitute for
-the child's status or evidence checks.
+`checks` contain names, status, summaries, assertions, and available evidence or
+coverage details. `conditions` contains resolved settings and their verification.
+Read these fields to distinguish a website failure from unsupported setup or
+insufficient evidence. Dashboard and session URLs require account sign-in.
 
-`inconclusive` means sufficient evidence was not established. `error` indicates
-execution or preparation could not complete. Inspect `error`, `error_code`,
-`conditions`, `condition_receipts`, and `checks` when present. Use `run_url` and each child's `session_url` for dashboard
-evidence; sign-in to the owning account is required.
-
-## Read logs
+## List tests and read logs
 
 ```python
-page = client.runs.logs(run_id, limit=200)
-for event in page["logs"]:
-    print(event["time"], event["test_id"], event["phase"], event["message"])
+tests = client.tests.list(limit=50)
+for test in tests["data"]:
+    print(test["id"], test["status"])
 
-if page["next_cursor"] is not None:
-    page = client.runs.logs(run_id, cursor=page["next_cursor"], limit=200)
+page = client.tests.logs(test_id, limit=200)
+for event in page["data"]:
+    print(event["time"], event["execution_id"], event["phase"], event["message"])
 ```
 
-Use a child result's `id` as `test_id` to filter one device. `limit` accepts 1–500
-and defaults to 200. Pass cursors back unchanged. Filtering happens after a page
-is read, so an empty filtered page can still have `next_cursor`.
+Pass `next_cursor` unchanged to get the next page. Test pages contain up to 100
+items; log pages contain up to 500 events. Use an execution's ID as `execution_id`
+to filter logs. Pagination fills the page with matching events before returning a
+continuation cursor.
 
-`next_cursor: null` means you have caught up with existing logs. Runs also
-return `cursor`, a watermark you can send later to fetch newly appended events.
-A parent lifecycle event has
-`test_id: null`.
+For logs, `next_cursor: null` means you have caught up. Retain the returned `cursor`
+watermark and pass it later to read newly appended events. Test-level log events
+have `execution_id: null`.
 
 ## Cancel and clean up
 
-Call `POST /v1/runs/{run_id}/cancel` or `client.runs.cancel(run_id)` to request
-cancellation. Continue polling: running devices must finish cleanup before the
-parent becomes complete. Cancelling an already completed run returns it unchanged.
-Closing the SDK or reaching its local wait timeout does not cancel remote work.
+```python
+client.tests.cancel(test_id)
+result = client.tests.wait(test_id)
+```
+
+Cancellation is cooperative. Continue polling until a terminal status confirms
+that execution and cleanup have finished. Cancelling a terminal test returns it
+unchanged. Closing the SDK or reaching a local wait timeout does not cancel it.
 
 ## Read usage
 
-`GET /v1/runs/{run_id}/usage` returns the same run representation as the ordinary
-get endpoint, with aggregate `usage` and `results[].usage`. The SDK has no separate
-usage method; read these fields from `client.runs.get(run_id)`.
+Read aggregate `usage` and per-execution `usage` from the test response.
+`browser_seconds` reports browser time; `complete` says whether that time has
+been confirmed. This confirmation is independent of the test status. Null usage
+means no snapshot is available; an incomplete value may still change.
 
-`bedrock` and `jev` contain input, output, total, cache-read, cache-write, request,
-and unreported-request counters. `device_farm` contains `duration_seconds`,
-`billed_minutes`, `sessions`, and `unconfirmed_sessions`.
-
-`usage.complete` describes whether provider accounting is confirmed. It is
-independent of execution completion, so counters can remain incomplete after a
-test ends. Null usage means no recorded snapshot is available. Billing can settle
-later and includes credit seconds used when applicable.
+`billing` contains `status`, `amount_cents`, `currency`, `credit_seconds_used`, and
+`invoice_url` when available. Billing can settle after the test ends. Follow your
+account's available minutes and billing state in the dashboard.

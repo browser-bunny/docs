@@ -1,57 +1,81 @@
 ---
 title: "Errors, retries, and limits"
-description: "Handle submission errors and retry without starting duplicate tests."
+description: "Handle submission errors and retry without creating duplicate tests."
 ---
 
-## Idempotency
+## Retry a submission
 
-Every HTTP `POST /v1/runs` requires `Idempotency-Key`: 8–128 letters, numbers,
-periods, underscores, colons, or hyphens. The Python SDK generates a key when you
-omit it. Retain your own key when you need to retry an uncertain submission.
+Use an optional `Idempotency-Key` on `POST /v1/tests`: 8–128 letters, numbers,
+periods, underscores, colons, or hyphens. The SDK generates one when omitted.
+Retain your own stable key when you need to retry an uncertain submission.
 
-A new request returns `202`. Reusing the same key and request returns the existing
-run's current state with `200`. Changing the URL, trimmed instructions, device
-selection, project, or nonempty file list returns `409`. File order matters.
-Identical replays do not dispatch another run or consume another submission attempt.
+A new submission returns `202`. The same key and request return the existing test
+with `200`. Changing the starting URL, trimmed instructions, resolved environment
+selection, project, or nonempty file list with that key returns `409`. File order
+matters. An identical replay does not create another execution.
 
-There are no automatic POST retries in the SDK. If a connection fails after
-submission, retry with the same key and request. Use a new key only for a new test.
-SDK platform resolution can change when the catalog changes; retain resolved
-`devices` for stable retries if you need exact coverage.
+The SDK never retries POST requests automatically. Use a new key for a new test.
+The release selectors `latest` and `previous` can resolve to different installed
+versions over time; inspect `actual_environment` when comparing separate tests.
 
 ## HTTP errors
 
+Application-generated errors have this structure:
+
+```json
+{
+  "error": {
+    "code": "not_found",
+    "message": "Test not found.",
+    "param": null,
+    "request_id": "req_example"
+  }
+}
+```
+
 | Status | Typical cause | Action |
 | --- | --- | --- |
-| `401` | Missing or invalid API key | Send an active project key |
-| `402` | Minutes unavailable, billing not ready, or a locked target | Inspect the message and choose an available target or arrange minutes |
-| `403` | Gateway authorization rejected, target disabled, or origin rejected | Check the key, account preferences, and request origin |
-| `404` | Run or device test not accessible in this project | Check the IDs and project key |
-| `409` | Idempotency conflict or minutes reserved by a previous run | Restore the original inputs, or wait for the previous run to settle |
-| `422` | Missing header, invalid field, URL, target, or log parameter | Correct the request |
-| `429` | Submission throttled or another browser run is active | Wait for `Retry-After` seconds before retrying |
-| `503` | A backing service is temporarily unavailable | Retry reads; retain the idempotency key for submissions |
+| `401` | Missing or invalid API key | Use an active project key |
+| `402` | Test minutes or billing readiness required | Review account minutes and the error message |
+| `403` | Permission or origin rejected | Check credentials and request origin |
+| `404` | Test or execution not accessible in this project | Check the IDs and project key |
+| `409` | Idempotency conflict or minutes pending settlement | Restore original inputs or wait for settlement |
+| `422` | Invalid fields, URL, environment, or query | Correct the indicated request |
+| `429` | AWS account or service request throttling | Honor `Retry-After` when returned; back off before retrying |
+| `500` | An unexpected service error occurred | Keep `request_id`; retain the key when retrying submission |
+| `503` | A backing service is unavailable | Retry reads; retain the key when retrying submission |
 
-Application errors normally use `{"detail": "Message"}`. Request validation can
-return an array in `detail`; gateway authentication errors use `message` instead.
-Minute-related errors may include `code: "minutes_required"` or
-`code: "minutes_pending"`. An accepted asynchronous run can later finish with an
-error; that appears in the run result, not as a delayed HTTP submission response.
+AWS API Gateway can reject authentication or throttle a request before it reaches
+the application. Those responses can use the gateway's own JSON shape, such as
+`{"message": "Unauthorized"}`, and may have no application `request_id` or `req_`
+identifier. The SDK still selects its typed exception from the HTTP status;
+application-specific error fields may be unavailable.
 
-## Current service limits
+Keep `request_id` for support when present. A successful asynchronous submission can later
+finish with an execution error. Read `executions[].error`, conditions, and checks
+for that result; it is separate from an HTTP request error.
+
+## Current limits
 
 | Setting | Current behavior |
 | --- | --- |
-| `start_url` | 8–2,000 characters; public HTTPS, without credentials or private addresses |
-| `instructions` | 5–3,000 characters; must also meet the minimum after trimming |
-| Targets per run | At most eight distinct enabled configurations |
-| Concurrent runs | One active browser run across the service; additional submissions receive `429` |
-| Submission attempts | Ten new attempts per account per UTC minute, shared across projects and keys |
-| File source URL | At most 2,000 characters each; no separate list-count limit |
+| `start_url` | 8–2,000 characters; public HTTPS without credentials or private addresses |
+| `instructions` | 5–3,000 characters; minimum also applies after trimming |
+| Browser planning | At most eight concise browser steps per test; split longer workflows into separate tests |
+| `environments` | Nonempty when supplied; distinct supported combinations after defaults |
+| Queue deadline | Up to six hours to start an execution |
+| Browser work | Nine minutes including browser startup, followed by cleanup and failure handling |
+| File source URL | At most 2,000 characters per URL |
 | File transfer | 10 MiB, 30 seconds, up to three redirects per file |
-| Log page | 1–500 records; default 200 |
-| Log query strings | `test_id` up to 128 characters; `cursor` up to 2,048 |
+| Test page | 1–100 tests; default 50 |
+| Log page | 1–500 events; default 200 |
+| Cursor | At most 2,048 characters; pass the returned value unchanged |
 
-These are current BrowserBunny implementation limits, not AWS account quotas.
-Admission attempts rejected for billing or an active browser can still count
-toward the per-minute submission limit.
+The character limit does not guarantee that every workflow fits the planner.
+Steps and generated checks share a bounded execution plan; viewport sweeps can
+use several steps. Simplify or split requests that exceed that plan.
+
+Accepted executions may queue while browser capacity is occupied. Available
+minutes, credit reservations, and settlement can also affect admission. Acceptance
+does not reserve an immediate browser start. The SDK's default 900-second wait
+limits local polling and can expire while the remote test is still queued.
