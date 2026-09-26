@@ -288,6 +288,41 @@
         "title": "Check",
         "type": "object"
       },
+      "CheckEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "check_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Check Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed",
+              "inconclusive",
+              "error",
+              "cancelled",
+              "not_required"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "type": {
+            "const": "check.completed",
+            "default": "check.completed",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_id",
+          "status"
+        ],
+        "title": "CheckEvent",
+        "type": "object"
+      },
       "ConditionCapability": {
         "additionalProperties": false,
         "properties": {
@@ -814,9 +849,80 @@
         "title": "GatewayError",
         "type": "object"
       },
+      "LifecycleEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancelling",
+              "passed",
+              "failed",
+              "inconclusive",
+              "error",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "test.created",
+              "test.cancel_requested",
+              "test.completed",
+              "execution.started",
+              "execution.completed"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "status"
+        ],
+        "title": "LifecycleEvent",
+        "type": "object"
+      },
       "Log": {
         "additionalProperties": false,
         "properties": {
+          "event": {
+            "description": "Stable structured activity. Use event.type and its fields; message is display text.",
+            "discriminator": {
+              "mapping": {
+                "check.completed": "#/components/schemas/CheckEvent",
+                "execution.completed": "#/components/schemas/LifecycleEvent",
+                "execution.started": "#/components/schemas/LifecycleEvent",
+                "message": "#/components/schemas/MessageEvent",
+                "network.summary": "#/components/schemas/NetworkSummaryEvent",
+                "step.recorded": "#/components/schemas/StepEvent",
+                "test.cancel_requested": "#/components/schemas/LifecycleEvent",
+                "test.completed": "#/components/schemas/LifecycleEvent",
+                "test.created": "#/components/schemas/LifecycleEvent"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MessageEvent"
+              },
+              {
+                "$ref": "#/components/schemas/LifecycleEvent"
+              },
+              {
+                "$ref": "#/components/schemas/StepEvent"
+              },
+              {
+                "$ref": "#/components/schemas/CheckEvent"
+              },
+              {
+                "$ref": "#/components/schemas/NetworkSummaryEvent"
+              }
+            ],
+            "title": "Event"
+          },
           "execution_id": {
             "anyOf": [
               {
@@ -899,6 +1005,19 @@
           "cursor"
         ],
         "title": "LogPage",
+        "type": "object"
+      },
+      "MessageEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "const": "message",
+            "default": "message",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "title": "MessageEvent",
         "type": "object"
       },
       "NetworkPage": {
@@ -1116,6 +1235,522 @@
         "title": "NetworkRequest",
         "type": "object"
       },
+      "NetworkSummaryEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "const": "network.summary",
+            "default": "network.summary",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "title": "NetworkSummaryEvent",
+        "type": "object"
+      },
+      "ReportCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "assertions": {
+            "items": {
+              "$ref": "#/components/schemas/Assertion"
+            },
+            "title": "Assertions",
+            "type": "array"
+          },
+          "coverage": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage"
+          },
+          "evidence": {
+            "items": {},
+            "title": "Evidence",
+            "type": "array"
+          },
+          "expected": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "verification_method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Method"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "status",
+          "summary"
+        ],
+        "title": "ReportCheck",
+        "type": "object"
+      },
+      "ReportCondition": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "resolved": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Resolved",
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "verified",
+              "unverified",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "status",
+          "resolved"
+        ],
+        "title": "ReportCondition",
+        "type": "object"
+      },
+      "ReportExecution": {
+        "additionalProperties": false,
+        "properties": {
+          "actual_environment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActualEnvironment"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/ReportCheck"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "conditions": {
+            "items": {
+              "$ref": "#/components/schemas/ReportCondition"
+            },
+            "title": "Conditions",
+            "type": "array"
+          },
+          "environment": {
+            "$ref": "#/components/schemas/Environment"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionError"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "pattern": "^exec_[a-f0-9]{24}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "network": {
+            "$ref": "#/components/schemas/ReportNetwork"
+          },
+          "session_url": {
+            "title": "Session Url",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancelling",
+              "passed",
+              "failed",
+              "inconclusive",
+              "error",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/ReportStep"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "environment",
+          "actual_environment",
+          "conditions",
+          "steps",
+          "checks",
+          "limitations",
+          "error",
+          "session_url",
+          "network"
+        ],
+        "title": "ReportExecution",
+        "type": "object"
+      },
+      "ReportMeasurement": {
+        "additionalProperties": false,
+        "properties": {
+          "actual": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual"
+          },
+          "expected": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ReportMeasurement",
+        "type": "object"
+      },
+      "ReportNetwork": {
+        "additionalProperties": false,
+        "properties": {
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "failed_requests": {
+            "items": {
+              "$ref": "#/components/schemas/NetworkRequest"
+            },
+            "title": "Failed Requests",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "collecting",
+              "complete",
+              "partial",
+              "unavailable",
+              "expired"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "status",
+          "url",
+          "expires_at",
+          "failed_requests",
+          "truncated"
+        ],
+        "title": "ReportNetwork",
+        "type": "object"
+      },
+      "ReportStep": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "check_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check Id"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "measurements": {
+            "items": {
+              "$ref": "#/components/schemas/ReportMeasurement"
+            },
+            "title": "Measurements",
+            "type": "array"
+          },
+          "number": {
+            "minimum": 1.0,
+            "title": "Number",
+            "type": "integer"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "number",
+          "check_id",
+          "action",
+          "description",
+          "at",
+          "url",
+          "measurements"
+        ],
+        "title": "ReportStep",
+        "type": "object"
+      },
+      "StepEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Action",
+            "type": "string"
+          },
+          "check_id": {
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Check Id",
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 600,
+            "title": "Description",
+            "type": "string"
+          },
+          "number": {
+            "description": "One-based recorded step number within this check.",
+            "minimum": 1.0,
+            "title": "Number",
+            "type": "integer"
+          },
+          "type": {
+            "const": "step.recorded",
+            "default": "step.recorded",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_id",
+          "number",
+          "action",
+          "description"
+        ],
+        "title": "StepEvent",
+        "type": "object"
+      },
       "Test": {
         "additionalProperties": false,
         "properties": {
@@ -1282,6 +1917,64 @@
           "next_cursor"
         ],
         "title": "TestPage",
+        "type": "object"
+      },
+      "TestReport": {
+        "additionalProperties": false,
+        "properties": {
+          "executions": {
+            "items": {
+              "$ref": "#/components/schemas/ReportExecution"
+            },
+            "title": "Executions",
+            "type": "array"
+          },
+          "instructions": {
+            "title": "Instructions",
+            "type": "string"
+          },
+          "markdown": {
+            "title": "Markdown",
+            "type": "string"
+          },
+          "start_url": {
+            "title": "Start Url",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "cancelling",
+              "passed",
+              "failed",
+              "inconclusive",
+              "error",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "test_id": {
+            "pattern": "^test_[a-f0-9]{24}$",
+            "title": "Test Id",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "test_id",
+          "status",
+          "start_url",
+          "instructions",
+          "url",
+          "executions",
+          "markdown"
+        ],
+        "title": "TestReport",
         "type": "object"
       },
       "TestRequest": {
@@ -2902,6 +3595,215 @@
           }
         ],
         "summary": "Read test logs",
+        "tags": [
+          "Tests"
+        ]
+      }
+    },
+    "/v1/tests/{test_id}/report": {
+      "get": {
+        "operationId": "getTestReport",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "test_id",
+            "required": true,
+            "schema": {
+              "title": "Test Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "execution_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^exec_[a-f0-9]{24}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Execution Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestReport"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Missing or invalid API key.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Permission denied.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "Resource not found in this project.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "Invalid request.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/APIError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "AWS account or service request throttling.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "An unexpected error occurred.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIError"
+                }
+              }
+            },
+            "description": "Service temporarily unavailable.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Application request identifier for support, when provided.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Export a test report for a coding agent",
         "tags": [
           "Tests"
         ]

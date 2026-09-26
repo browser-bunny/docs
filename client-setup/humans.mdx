@@ -22,10 +22,10 @@ export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 </Tab>
 <Tab title="Python">
 
-Use Python 3.10 or newer. Install the hosted client package, version 0.9.0:
+Use Python 3.10 or newer. Install the hosted client package, version 0.10.0:
 
 ```bash
-python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.9.0-py3-none-any.whl
+python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.10.0-py3-none-any.whl
 export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 ```
 
@@ -194,6 +194,7 @@ Call these methods on a `BrowserBunny` client:
 | `environments.list()` | Discover environments and capabilities |
 | `tests.create()` | Create an accepted test |
 | `tests.get()` | Read a test and its executions |
+| `tests.report()` | Read structured findings and Markdown for a bug handoff |
 | `tests.list()` | Read a page of project tests |
 | `tests.wait()` | Poll until terminal |
 | `tests.logs()` | Read a page of test logs |
@@ -206,6 +207,8 @@ Call these methods on a `BrowserBunny` client:
 - `tests.create()`: requires `start_url` and `instructions`; optionally accepts
   `environments`, `files`, and `idempotency_key` as keyword arguments.
 - `tests.get()` and `tests.cancel()`: require `test_id`.
+- `tests.report()`: requires `test_id`; optional keyword argument `execution_id`
+  selects one execution.
 - `tests.list()`: optional keyword arguments `cursor` and `limit` (default 50).
 - `tests.wait()`: requires `test_id`; optional keyword arguments `timeout`
   (default 900) and `poll_interval` (default 2), both in seconds.

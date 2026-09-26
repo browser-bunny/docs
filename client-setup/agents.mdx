@@ -4,7 +4,7 @@ description: "Connect your coding agent to create browser tests, inspect results
 ---
 
 Connect once with your project API key. Your agent can discover environments,
-create tests, read results and logs, and request cancellation through MCP.
+create tests, read results and logs, prepare bug reports, and request cancellation through MCP.
 
 ## Before you start
 
@@ -169,6 +169,7 @@ A working connection exposes these tools:
 | `create_test` | Submit a test and return its ID |
 | `list_tests` | List tests in your project |
 | `get_test` | Read status, execution checks, errors, and dashboard links |
+| `get_test_report` | Read structured findings and Markdown for a bug handoff |
 | `get_test_logs` | Read or poll test events |
 | `get_test_network` | Read network requests, optionally showing only errors |
 | `cancel_test` | Request cancellation |
@@ -210,6 +211,8 @@ changed inputs returns `conflict`. A new intended test needs a new key.
 - **Polling:** pass the returned `test_id` to `get_test` about every two seconds.
 - **Terminal statuses:** `passed`, `failed`, `inconclusive`, `error`, and `cancelled`.
 - **Logs:** use `get_test_logs`; follow `next_cursor` for more pages or `cursor` for new events.
+- **Bug handoff:** use `get_test_report` with `test_id`; optionally select one
+  `execution_id`. Use its structured `executions` for analysis or `markdown` for a ticket.
 - **Cancellation:** call `cancel_test`, then poll until terminal.
 - **Disconnected client:** accepted tests continue. Reconnect and use the saved ID.
 
@@ -222,7 +225,7 @@ See [results](/results) for execution checks, evidence, and usage.
 | Symptom | Next step |
 | --- | --- |
 | Connection returns `401` or `403` | Check the Authorization header, key status, and MCP server URL above |
-| Agent only has documentation search | Connect to the API MCP URL above and enable its six test tools |
+| Agent only has documentation search | Connect to the API MCP URL above and enable its test tools |
 | `minutes_required` | Add test minutes to the account that owns the key |
 | `invalid_request` | Check the named field against the tool's input schema |
 | `not_found` | Use a test ID from the project selected by this key |

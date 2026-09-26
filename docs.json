@@ -57,6 +57,7 @@
               "api-reference/create-test",
               "api-reference/list-tests",
               "api-reference/get-test",
+              "api-reference/get-test-report",
               "api-reference/cancel-test",
               "api-reference/get-test-logs",
               "api-reference/get-test-network"

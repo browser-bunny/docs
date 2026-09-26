@@ -28,7 +28,7 @@ and assets in sync with the application when the brand changes.
 
 ## Public API reference
 
-The backend owns the seven public operations and their request/response schemas.
+The backend owns the public operations and their request/response schemas.
 `dash/agent/openapi.py` exports the registered routes and runtime response models.
 The export includes paths, query parameters, request models, and response models.
 Backend tests validate real service responses against it.
@@ -62,7 +62,7 @@ retain Mintlify's native Markdown copying and success feedback.
 `client-setup.mdx` offers two paths: `client-setup/agents.mdx` for the authenticated
 test MCP and `client-setup/humans.mdx` for direct API clients. The test endpoint is
 `https://api.browserbunny.dev/v1/mcp` and uses the same project API keys as REST.
-It exposes seven tools, with input/output schemas derived from the live HTTP
+It exposes tools with input/output schemas derived from the live HTTP
 contract. MCP create submissions require `idempotency_key` for safe retries.
 Verify discovery and a real tool call before changing connection guidance.
 
