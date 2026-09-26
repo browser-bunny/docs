@@ -1,57 +1,84 @@
 ---
 title: "For agents"
-description: "Connect your coding agent to BrowserBunny documentation through MCP."
+description: "Connect your coding agent to create browser tests, inspect results, and cancel work through MCP."
 ---
 
-Give your agent access to current API documentation, examples, and browser
-capabilities. It can use that guidance to build your integration and submit tests.
+Connect once with your project API key. Your agent can discover environments,
+create tests, read results and logs, and request cancellation through MCP.
 
-## Connect the MCP server
+## Before you start
+
+1. Create a project API key in the [dashboard](https://dash.browserbunny.dev).
+2. Make sure the account has test minutes before creating tests.
+3. Choose an MCP client that supports Streamable HTTP and an Authorization header.
+
+The key selects the project. Discovering environments and reading results do not
+start a browser or consume test minutes.
+
+## Connect the server
+
+```text MCP server URL
+https://api.browserbunny.dev/v1/mcp
+```
 
 | Setting | Value |
 | --- | --- |
-| Name | `browserbunny-docs` |
+| Name | `browserbunny` |
 | Transport | Streamable HTTP |
-| Authentication | None for public documentation |
-
-Copy this server URL into your client's MCP settings:
-
-```text MCP server URL
-https://browserbunny.dev/docs/mcp
-```
+| Authentication | Project API key in `Authorization: Bearer YOUR_PROJECT_API_KEY` |
 
 ### Choose your client
 
 <Tabs>
 <Tab title="Codex">
 
-Add the server and verify that it is listed:
-
-```bash
-codex mcp add browserbunny-docs --url https://browserbunny.dev/docs/mcp
-codex mcp list
-```
-
-Alternatively, merge this entry into `~/.codex/config.toml`:
+Merge this entry into `~/.codex/config.toml`:
 
 ```toml
-[mcp_servers.browserbunny-docs]
-url = "https://browserbunny.dev/docs/mcp"
+[mcp_servers.browserbunny]
+url = "https://api.browserbunny.dev/v1/mcp"
+bearer_token_env_var = "BROWSERBUNNY_API_KEY"
 ```
 
-See the [Codex connection guide](https://developers.openai.com/learn/docs-mcp).
+Set the key in the environment that launches Codex, then start a new session:
+
+```bash
+export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
+codex
+```
+
+For the desktop app, make the variable available to the app's process and restart
+it after changing the environment. See the
+[Codex MCP guide](https://developers.openai.com/codex/mcp).
 
 </Tab>
 <Tab title="Claude Code">
 
-Run these commands from the project where you use your agent:
+Merge this server into your project's `.mcp.json`:
 
-```bash
-claude mcp add --transport http browserbunny-docs https://browserbunny.dev/docs/mcp
-claude mcp get browserbunny-docs
+```json
+{
+  "mcpServers": {
+    "browserbunny": {
+      "type": "http",
+      "url": "https://api.browserbunny.dev/v1/mcp",
+      "headers": {
+        "Authorization": "Bearer ${BROWSERBUNNY_API_KEY}"
+      }
+    }
+  }
+}
 ```
 
-See the [Claude Code MCP guide](https://code.claude.com/docs/en/mcp).
+Set the key before launching Claude Code:
+
+```bash
+export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
+claude
+```
+
+Use `/mcp` to check the connection and enable the server's tools. See the
+[Claude Code MCP guide](https://code.claude.com/docs/en/mcp).
 
 </Tab>
 <Tab title="Cursor">
@@ -61,27 +88,43 @@ Merge this server into your project's `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "browserbunny-docs": {
-      "url": "https://browserbunny.dev/docs/mcp"
+    "browserbunny": {
+      "url": "https://api.browserbunny.dev/v1/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:BROWSERBUNNY_API_KEY}"
+      }
     }
   }
 }
 ```
 
-Enable the server in your MCP settings. See the
+Set `BROWSERBUNNY_API_KEY` in the environment that launches Cursor. Restart Cursor
+after changing it and enable the server in your MCP settings. See the
 [Cursor MCP guide](https://cursor.com/docs/mcp).
 
 </Tab>
 <Tab title="VS Code">
 
-Merge this server into your project's `.vscode/mcp.json`:
+Merge this configuration into your project's `.vscode/mcp.json`. VS Code prompts
+for your key when you start the server:
 
 ```json
 {
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "browserbunny-api-key",
+      "description": "BrowserBunny project API key",
+      "password": true
+    }
+  ],
   "servers": {
-    "browserbunny-docs": {
+    "browserbunny": {
       "type": "http",
-      "url": "https://browserbunny.dev/docs/mcp"
+      "url": "https://api.browserbunny.dev/v1/mcp",
+      "headers": {
+        "Authorization": "Bearer ${input:browserbunny-api-key}"
+      }
     }
   }
 }
@@ -93,70 +136,120 @@ See the [VS Code MCP guide](https://code.visualstudio.com/docs/agent-customizati
 </Tab>
 <Tab title="Other clients">
 
-1. Add a remote MCP server named `browserbunny-docs`.
-2. Set its URL to `https://browserbunny.dev/docs/mcp`.
-3. Select HTTP transport and leave authentication unset.
-4. Connect and enable its documentation tools.
+1. Add a remote MCP server named `browserbunny`.
+2. Set its URL to `https://api.browserbunny.dev/v1/mcp`.
+3. Select HTTP transport.
+4. Add `Authorization: Bearer YOUR_PROJECT_API_KEY` using the client's secret settings.
+5. Connect and enable the server's tools.
+
+This server uses project API keys. Choose a client that allows custom headers;
+clients that require an OAuth sign-in flow are not supported by this connection.
 
 </Tab>
 </Tabs>
 
-From any docs page, the menu beside **Copy Page** also offers the MCP URL,
-installation command, and connection options for supported editors.
+Keep your key in a secret setting or environment variable. Do not paste it into
+agent prompts or commit it to your repository. The configurations above reference
+the key without storing its value in the file.
+
+### Use staging
+
+Use a staging project key and replace the URL with:
+
+```text Staging MCP server URL
+https://api.staging.browserbunny.dev/v1/mcp
+```
 
 ## Verify the connection
 
 Ask your agent:
 
 ```text
-Use the BrowserBunny documentation MCP to find how to create a test.
-Tell me the required request fields, default environment, and how to
-follow the result. Link to the relevant documentation.
+Use BrowserBunny's list_environments tool and tell me which browsers
+and versions are available. Do not create a test yet.
 ```
 
-A working connection returns current guidance from these pages:
+A working connection exposes these tools:
 
-- [Create a test](/api-reference/create-test).
-- [Choose environments](/environments).
-- [Follow results](/results).
+| Tool | What it does |
+| --- | --- |
+| `list_environments` | Discover supported browsers, versions, and capabilities |
+| `create_test` | Submit a test and return its ID |
+| `list_tests` | List tests in your project |
+| `get_test` | Read status, execution checks, errors, and dashboard links |
+| `get_test_logs` | Read or poll test events |
+| `cancel_test` | Request cancellation |
 
-## Enable test submission
+## Create your first test
 
-The MCP server supplies documentation search and retrieval. Browser tests are
-created, read, and cancelled through the authenticated API.
-
-1. Create a project API key in the [dashboard](https://dash.browserbunny.dev).
-2. Make sure the account has test minutes.
-3. Set `BROWSERBUNNY_API_KEY` in the environment where your agent's code runs.
-4. Give the agent an HTTP client or terminal to call the API.
-
-Keep the project key in that execution environment; the public documentation MCP
-connection does not need it. See [authentication](/authentication) for project access.
-
-### Give your agent a first task
+Give your agent this task:
 
 ```text
-Use the BrowserBunny documentation MCP to read the current test API.
-The project key is available as BROWSERBUNNY_API_KEY.
+Use BrowserBunny to create a test for https://example.com with these
+instructions: "Verify that the page heading is Example Domain."
 
-Create a test for https://example.com with these instructions:
-"Verify that the page heading is Example Domain."
+Use the default environment. Generate an idempotency key for this
+submission and keep the same key if you need to retry it.
 
-Use the default environment. Retain the test ID, poll until terminal,
-and report the status, execution checks, and dashboard URL.
+Retain the returned test ID. Poll get_test about every two seconds
+until terminal, then report the status, checks, and dashboard URL.
 ```
+
+### Test inputs
+
+`create_test` accepts the same test fields as the [API](/api-reference/create-test):
+
+| Input | Requirement |
+| --- | --- |
+| `start_url` | Required public HTTPS starting page |
+| `instructions` | Required actions and checks in ordinary language |
+| `environments` | Optional browser selections; defaults to Windows Chrome `latest` |
+| `files` | Optional list of public HTTPS file URLs |
+| `idempotency_key` | Required for MCP submissions; unique to the intended test |
+
+An idempotency key must be 8–128 characters using letters, numbers, `_`, `.`, `:`,
+or `-`. Reuse the key and all inputs after an uncertain response. Reusing it with
+changed inputs returns `conflict`. A new intended test needs a new key.
+
+### Follow results
+
+- **Submission:** returns after acceptance; the browser test continues asynchronously.
+- **Polling:** pass the returned `test_id` to `get_test` about every two seconds.
+- **Terminal statuses:** `passed`, `failed`, `inconclusive`, `error`, and `cancelled`.
+- **Logs:** use `get_test_logs`; follow `next_cursor` for more pages or `cursor` for new events.
+- **Cancellation:** call `cancel_test`, then poll until terminal.
+- **Disconnected client:** accepted tests continue. Reconnect and use the saved ID.
+
+The response fields match the [API reference](/api-reference/get-test). Tool failures
+set `isError` and return `error.code`, `message`, `param`, and `request_id`.
+See [results](/results) for execution checks, evidence, and usage.
 
 ## Troubleshoot setup
 
 | Symptom | Next step |
 | --- | --- |
-| Server does not connect | Check the full HTTPS URL, including `/docs/mcp`, and HTTP transport |
-| Agent does not use the docs | Enable the server's tools and explicitly ask it to use the BrowserBunny MCP |
-| Agent can read docs but cannot create a test | Provide an HTTP client or terminal, project key, and test minutes |
-| A test request is rejected | Inspect the API error and follow [errors and limits](/errors-and-limits) |
+| Connection returns `401` or `403` | Check the Authorization header, key status, and matching production or staging URL |
+| Agent only has documentation search | Connect to the API MCP URL above and enable its six test tools |
+| `minutes_required` | Add test minutes to the account that owns the key |
+| `invalid_request` | Check the named field against the tool's input schema |
+| `not_found` | Use a test ID from the project selected by this key |
+| `conflict` | Reuse the original inputs for a retry, or a new key for a new test |
+| Opening the MCP URL in a browser fails | Connect through an MCP client; the endpoint expects authenticated protocol requests |
+
+## Optional documentation search
+
+For documentation search alongside the test tools, add a second server named
+`browserbunny-docs` with no authentication:
+
+```text Documentation MCP server URL
+https://browserbunny.dev/docs/mcp
+```
+
+The MCP shortcuts beside **Copy Page** connect to this documentation server.
+Use the setup above for creating and managing tests.
 
 ## Next steps
 
-- [Quickstart](/quickstart): the complete request and polling flow.
-- [API reference](/api-reference/create-test): request and response fields.
-- [Direct client setup](/client-setup/humans): installation and connection details.
+- [Choose environments](/environments): select browsers and versions.
+- [Upload files](/files): provide upload sources in test instructions.
+- [Network and language conditions](/conditions): describe the conditions to test.

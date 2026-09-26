@@ -56,12 +56,16 @@ retain Mintlify's native Markdown copying and success feedback.
 
 ## Setup paths
 
-`client-setup.mdx` offers two paths: `client-setup/agents.mdx` for the public
-Mintlify documentation MCP and `client-setup/humans.mdx` for direct API clients.
-The MCP endpoint is `https://browserbunny.dev/docs/mcp`. It provides documentation
-retrieval; browser-test execution uses the authenticated `/v1` API. Keep that
-scope explicit and verify the live MCP handshake and advertised tools before
-changing connection guidance. Do not put project API keys in the public MCP config.
+`client-setup.mdx` offers two paths: `client-setup/agents.mdx` for the authenticated
+test MCP and `client-setup/humans.mdx` for direct API clients. The test endpoint is
+`https://api.browserbunny.dev/v1/mcp` and uses the same project API keys as REST.
+It exposes six tools, with input/output schemas derived from the live HTTP
+contract. MCP create submissions require `idempotency_key` for safe retries.
+Verify discovery and a real tool call before changing connection guidance.
+
+Mintlify's `https://browserbunny.dev/docs/mcp` remains an optional documentation
+search server. Its page-menu shortcuts connect to documentation, not test tools.
+Never send project API keys to the public documentation MCP.
 
 ## Release workflow
 
