@@ -50,6 +50,24 @@ img.nav-logo {
 
 .bb-card:hover { border-color: var(--bb-accent); }
 
+/* Client install links use the same action styling as the dashboard button. */
+a.bb-install-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: 0.5rem 0;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--bb-accent);
+  border-radius: 8px;
+  background: var(--bb-accent);
+  color: #000 !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+a.bb-install-button:hover { filter: brightness(1.1); }
+
 /* Keep Mintlify's native page-copy action visible and easy to tap. */
 #page-context-menu-button {
   min-height: 44px;

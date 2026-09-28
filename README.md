@@ -69,6 +69,12 @@ It exposes tools with input/output schemas derived from the live HTTP
 contract. MCP creation exposes only `start_url`, `instructions`, and `devices`. After an uncertain submission, inspect existing tests before creating another.
 Verify discovery and a real tool call before changing connection guidance.
 
+The agent setup page offers Cursor and VS Code install links, with manual
+configuration collapsed below each client. Install links contain only an
+environment-variable reference or a masked input prompt, never an API key.
+When changing the MCP endpoint, regenerate the encoded install-link payloads
+and verify they match the manual configuration as well as the live server.
+
 Mintlify's `https://browserbunny.dev/docs/mcp` remains an optional documentation
 search server. Its page-menu shortcuts connect to documentation, not test tools.
 Never send API keys to the public documentation MCP.

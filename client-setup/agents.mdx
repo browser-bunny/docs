@@ -1,89 +1,30 @@
 ---
 title: "For agents"
-description: "Connect your coding agent to create browser tests, inspect results, and cancel work through MCP."
+description: "Connect your coding agent to run browser tests and investigate bugs."
 ---
 
-Connect once with your API key. Your agent can discover devices,
-create tests, read results and logs, prepare bug reports, and request cancellation through MCP.
+## 1. Create an API key
 
-## Before you start
+Create a key in the [dashboard](https://dash.browserbunny.dev).
+Keep it ready for the connection step below.
 
-1. Create an API key in the [dashboard](https://dash.browserbunny.dev).
-2. Make sure the account has test minutes before creating tests.
-3. Choose an MCP client that supports Streamable HTTP and an Authorization header.
+## 2. Connect your client
 
-The key authenticates your account. Discovering devices and reading results do not
-start a browser or consume test minutes.
-
-## Connect the server
-
-```text MCP server URL
-https://api.browserbunny.dev/v1/mcp
-```
-
-| Setting | Value |
-| --- | --- |
-| Name | `browserbunny` |
-| Transport | Streamable HTTP |
-| Authentication | API key in `Authorization: Bearer YOUR_API_KEY` |
-
-### Choose your client
+Choose your client. Install buttons add the server configuration; your API key is
+supplied separately.
 
 <Tabs>
-<Tab title="Codex">
-
-Merge this entry into `~/.codex/config.toml`:
-
-```toml
-[mcp_servers.browserbunny]
-url = "https://api.browserbunny.dev/v1/mcp"
-bearer_token_env_var = "BROWSERBUNNY_API_KEY"
-```
-
-Set the key in the environment that launches Codex, then start a new session:
-
-```bash
-export BROWSERBUNNY_API_KEY="YOUR_API_KEY"
-codex
-```
-
-For the desktop app, make the variable available to the app's process and restart
-it after changing the environment. See the
-[Codex MCP guide](https://developers.openai.com/codex/mcp).
-
-</Tab>
-<Tab title="Claude Code">
-
-Merge this server into your repository's `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "browserbunny": {
-      "type": "http",
-      "url": "https://api.browserbunny.dev/v1/mcp",
-      "headers": {
-        "Authorization": "Bearer ${BROWSERBUNNY_API_KEY}"
-      }
-    }
-  }
-}
-```
-
-Set the key before launching Claude Code:
-
-```bash
-export BROWSERBUNNY_API_KEY="YOUR_API_KEY"
-claude
-```
-
-Use `/mcp` to check the connection and enable the server's tools. See the
-[Claude Code MCP guide](https://code.claude.com/docs/en/mcp).
-
-</Tab>
 <Tab title="Cursor">
 
-Merge this server into your repository's `.cursor/mcp.json`:
+<a className="bb-install-button" href="https://cursor.com/link/mcp/install?name=browserbunny&config=eyJ1cmwiOiJodHRwczovL2FwaS5icm93c2VyYnVubnkuZGV2L3YxL21jcCIsImhlYWRlcnMiOnsiQXV0aG9yaXphdGlvbiI6IkJlYXJlciAke2VudjpCUk9XU0VSQlVOTllfQVBJX0tFWX0ifX0%3D">Add to Cursor</a>
+
+1. Click **Add to Cursor** and confirm the installation.
+2. Set `BROWSERBUNNY_API_KEY` in the environment that launches Cursor, then restart it.
+3. Enable `browserbunny` in your MCP settings.
+
+<Accordion title="Manual configuration">
+
+Merge this entry into `~/.cursor/mcp.json`:
 
 ```json
 {
@@ -98,15 +39,20 @@ Merge this server into your repository's `.cursor/mcp.json`:
 }
 ```
 
-Set `BROWSERBUNNY_API_KEY` in the environment that launches Cursor. Restart Cursor
-after changing it and enable the server in your MCP settings. See the
-[Cursor MCP guide](https://cursor.com/docs/mcp).
+</Accordion>
 
 </Tab>
 <Tab title="VS Code">
 
-Merge this configuration into your repository's `.vscode/mcp.json`. VS Code prompts
-for your key when you start the server:
+<a className="bb-install-button" href="vscode:mcp/install?%7B%22name%22%3A%22browserbunny%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fapi.browserbunny.dev%2Fv1%2Fmcp%22%2C%22headers%22%3A%7B%22Authorization%22%3A%22Bearer%20%24%7Binput%3Abrowserbunny-api-key%7D%22%7D%2C%22inputs%22%3A%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22browserbunny-api-key%22%2C%22description%22%3A%22BrowserBunny%20API%20key%22%2C%22password%22%3Atrue%7D%5D%7D">Add to VS Code</a>
+
+1. Click **Add to VS Code** and confirm the installation.
+2. Start `browserbunny` and enter your API key when prompted.
+3. Enable its tools in your agent chat.
+
+<Accordion title="Manual configuration">
+
+Merge this configuration into `.vscode/mcp.json`:
 
 ```json
 {
@@ -130,29 +76,106 @@ for your key when you start the server:
 }
 ```
 
-Start the server from its configuration and enable its tools in your agent chat.
-See the [VS Code MCP guide](https://code.visualstudio.com/docs/agent-customization/mcp-servers).
+</Accordion>
+
+</Tab>
+<Tab title="Codex">
+
+Run this in your terminal, replacing `YOUR_API_KEY` with your key:
+
+```bash
+export BROWSERBUNNY_API_KEY="YOUR_API_KEY"
+codex mcp add browserbunny --url https://api.browserbunny.dev/v1/mcp \
+  --bearer-token-env-var BROWSERBUNNY_API_KEY
+codex
+```
+
+Use `/mcp` to check the connection.
+
+<Accordion title="Manual configuration">
+
+Merge this entry into `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.browserbunny]
+url = "https://api.browserbunny.dev/v1/mcp"
+bearer_token_env_var = "BROWSERBUNNY_API_KEY"
+```
+
+Set `BROWSERBUNNY_API_KEY` before starting your client.
+
+</Accordion>
+
+</Tab>
+<Tab title="Claude Code">
+
+Run this in your terminal, replacing `YOUR_API_KEY` with your key:
+
+```bash
+export BROWSERBUNNY_API_KEY="YOUR_API_KEY"
+claude mcp add --transport http --scope user browserbunny \
+  https://api.browserbunny.dev/v1/mcp \
+  --header 'Authorization: Bearer ${BROWSERBUNNY_API_KEY}'
+claude
+```
+
+Use `/mcp` to check the connection and enable the server's tools.
+
+<Accordion title="Manual configuration">
+
+Merge this server into `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "browserbunny": {
+      "type": "http",
+      "url": "https://api.browserbunny.dev/v1/mcp",
+      "headers": {
+        "Authorization": "Bearer ${BROWSERBUNNY_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+Set `BROWSERBUNNY_API_KEY` before starting your client.
+
+</Accordion>
 
 </Tab>
 <Tab title="Other clients">
 
-1. Add a remote MCP server named `browserbunny`.
-2. Set its URL to `https://api.browserbunny.dev/v1/mcp`.
-3. Select HTTP transport.
-4. Add `Authorization: Bearer YOUR_API_KEY` using the client's secret settings.
-5. Connect and enable the server's tools.
+Add a remote MCP server with these settings, then connect and enable its tools:
 
-This server uses API keys. Choose a client that allows custom headers;
-clients that require an OAuth sign-in flow are not supported by this connection.
+| Setting | Value |
+| --- | --- |
+| Name | `browserbunny` |
+| URL | `https://api.browserbunny.dev/v1/mcp` |
+| Transport | Streamable HTTP |
+| Header | `Authorization: Bearer YOUR_API_KEY` |
+
+Use a client that supports custom headers. This connection uses API keys,
+not an OAuth sign-in.
 
 </Tab>
 </Tabs>
 
-Keep your key in a secret setting or environment variable. Do not paste it into
-agent prompts or commit it to your repository. The configurations above reference
-the key without storing its value in the file.
+<Accordion title="Using an environment variable">
 
-## Verify the connection
+For setups that reference `BROWSERBUNNY_API_KEY`, set it before launching your client:
+
+```bash
+export BROWSERBUNNY_API_KEY="YOUR_API_KEY"
+```
+
+This sets the key for programs launched from that terminal. Desktop apps need
+the same variable in their launch environment; restart them after changing it.
+Keep the key out of agent prompts and version control.
+
+</Accordion>
+
+## 3. Check the connection
 
 Ask your agent:
 
@@ -161,7 +184,9 @@ Use BrowserBunny's list_devices tool and tell me which browsers
 and versions are available. Do not create a test yet.
 ```
 
-A working connection exposes these tools:
+This check does not start a browser or use test minutes.
+
+<Accordion title="Available tools">
 
 | Tool | What it does |
 | --- | --- |
@@ -174,7 +199,11 @@ A working connection exposes these tools:
 | `get_test_network` | Read network requests, optionally showing only errors |
 | `cancel_test` | Request cancellation |
 
-## Create your first test
+</Accordion>
+
+## 4. Run your first test
+
+Your account needs test minutes to run a test.
 
 Give your agent this task:
 
@@ -230,7 +259,6 @@ See [results](/results) for execution checks, evidence, and usage.
 | `minutes_required` | Add test minutes to the account that owns the key |
 | `invalid_request` | Check the named field against the tool's input schema |
 | `not_found` | Use a test ID from the account that owns this key |
-| `conflict` | Reuse the original inputs for a retry, or a new key for a new test |
 | Opening the MCP URL in a browser fails | Connect through an MCP client; the endpoint expects authenticated protocol requests |
 
 ## Optional documentation search
