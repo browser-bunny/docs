@@ -19,17 +19,17 @@ that the key works:
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/devices" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     catalog = client.devices.list()
     print(catalog)
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/devices" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 ```javascript JavaScript

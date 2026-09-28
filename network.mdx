@@ -12,18 +12,18 @@ include all requests. Connected agents use `get_test_network` with the same inpu
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body \
-  "https://api.browserbunny.dev/v1/tests/TEST_ID/executions/EXECUTION_ID/network?errors_only=true&limit=200" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     page = client.tests.network("TEST_ID", "EXECUTION_ID", errors_only=True, limit=200)
     print(page)
+```
+
+```bash cURL
+curl --fail-with-body \
+  "https://api.browserbunny.dev/v1/tests/TEST_ID/executions/EXECUTION_ID/network?errors_only=true&limit=200" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 ```javascript JavaScript

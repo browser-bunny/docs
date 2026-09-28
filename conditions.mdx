@@ -9,16 +9,6 @@ Write the conditions in ordinary `instructions` alongside the actions and checks
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
-  -H "Content-Type: application/json" \
-  --data '{
-  "start_url": "https://example.com",
-  "instructions": "Using a 3G connection, verify the heading is \"Example Domain\"."
-}'
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
@@ -28,6 +18,16 @@ with BrowserBunny() as client:
         instructions='Using a 3G connection, verify the heading is "Example Domain".',
     )
     print(test)
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{
+  "start_url": "https://example.com",
+  "instructions": "Using a 3G connection, verify the heading is \"Example Domain\"."
+}'
 ```
 
 ```javascript JavaScript

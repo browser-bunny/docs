@@ -42,6 +42,8 @@ Mintlify renders its parameters and responses directly. Guides explain the same
 contract with equivalent cURL, Python, and JavaScript examples, without duplicating
 endpoint schemas. Use matching `cURL`, `Python`, and `JavaScript` labels in
 `CodeGroup`, `RequestExample`, and `Tabs` components so selections synchronize.
+Put Python first in every language group and in `api.examples.languages` so it
+is selected by default; readers can still switch languages.
 Keep prose and headings language-neutral; put client-specific setup and behavior
 inside the matching tab on `client-setup/humans.mdx`. JSON response examples stay shared.
 

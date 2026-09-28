@@ -9,17 +9,17 @@ for the workflow.
 
 <RequestExample>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID/report" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     report = client.tests.report("TEST_ID")
     print(report)
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID/report" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 ```javascript JavaScript

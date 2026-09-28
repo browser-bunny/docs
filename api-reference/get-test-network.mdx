@@ -5,18 +5,18 @@ openapi: "/openapi/public-v1.json GET /v1/tests/{test_id}/executions/{execution_
 
 <RequestExample>
 
-```bash cURL
-curl --fail-with-body \
-  "https://api.browserbunny.dev/v1/tests/TEST_ID/executions/EXECUTION_ID/network?limit=200" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     page = client.tests.network("TEST_ID", "EXECUTION_ID", limit=200)
     print(page)
+```
+
+```bash cURL
+curl --fail-with-body \
+  "https://api.browserbunny.dev/v1/tests/TEST_ID/executions/EXECUTION_ID/network?limit=200" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 ```javascript JavaScript

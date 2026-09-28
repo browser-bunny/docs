@@ -5,17 +5,6 @@ openapi: "/openapi/public-v1.json POST /v1/tests"
 
 <RequestExample>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
-  -H "Content-Type: application/json" \
-  --data '{
-  "start_url": "https://example.com",
-  "instructions": "Verify that the page heading is Example Domain.",
-  "devices": ["desktop-chrome"]
-}'
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
@@ -26,6 +15,17 @@ with BrowserBunny() as client:
         devices=['desktop-chrome'],
     )
     print(test)
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{
+  "start_url": "https://example.com",
+  "instructions": "Verify that the page heading is Example Domain.",
+  "devices": ["desktop-chrome"]
+}'
 ```
 
 ```javascript JavaScript

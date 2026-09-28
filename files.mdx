@@ -11,16 +11,6 @@ description: "Include a public HTTPS file URL in your instructions and describe 
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
-  -H "Content-Type: application/json" \
-  --data '{
-  "start_url": "https://example.com/upload",
-  "instructions": "Upload \"https://files.example.com/invoice.pdf\" into Attachment, click Upload, and verify acceptance."
-}'
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
@@ -30,6 +20,16 @@ with BrowserBunny() as client:
         instructions='Upload \"https://files.example.com/invoice.pdf\" into Attachment, click Upload, and verify acceptance.',
     )
     print(test)
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{
+  "start_url": "https://example.com/upload",
+  "instructions": "Upload \"https://files.example.com/invoice.pdf\" into Attachment, click Upload, and verify acceptance."
+}'
 ```
 
 ```javascript JavaScript

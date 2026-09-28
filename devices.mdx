@@ -16,17 +16,6 @@ the latest browser release available from AWS. AWS manages the Windows version.
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
-  -H "Content-Type: application/json" \
-  --data '{
-    "start_url": "https://example.com",
-    "instructions": "Verify that the page heading is Example Domain.",
-    "devices": ["desktop-chrome", "desktop-firefox"]
-  }'
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
@@ -37,6 +26,17 @@ with BrowserBunny() as client:
         devices=["desktop-chrome", "desktop-firefox"],
     )
     print(test)
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "start_url": "https://example.com",
+    "instructions": "Verify that the page heading is Example Domain.",
+    "devices": ["desktop-chrome", "desktop-firefox"]
+  }'
 ```
 
 ```javascript JavaScript
@@ -66,17 +66,17 @@ console.log(test);
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/devices" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     catalog = client.devices.list()
     print(catalog)
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/devices" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 ```javascript JavaScript

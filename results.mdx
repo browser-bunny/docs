@@ -17,17 +17,17 @@ every two seconds until its status is terminal.
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     test = client.tests.get("TEST_ID")
     print(test)
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 ```javascript JavaScript
@@ -147,17 +147,17 @@ and `conditions` to distinguish website failures from setup errors or insufficie
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID/report" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" | jq -r '.markdown'
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     report = client.tests.report("TEST_ID")
     print(report["markdown"])
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID/report" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" | jq -r '.markdown'
 ```
 
 ```javascript JavaScript
@@ -186,17 +186,17 @@ See [Get a test report](/api-reference/get-test-report) for the response fields.
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/tests?limit=50" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     page = client.tests.list(limit=50)
     print(page)
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests?limit=50" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 ```javascript JavaScript
@@ -219,17 +219,17 @@ console.log(page);
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID/logs?limit=200" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     page = client.tests.logs("TEST_ID", limit=200)
     print(page)
+```
+
+```bash cURL
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests/TEST_ID/logs?limit=200" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 ```javascript JavaScript
@@ -288,17 +288,17 @@ expires after 14 days. An HTTP error does not automatically fail the test.
 
 <CodeGroup>
 
-```bash cURL
-curl --fail-with-body -X POST "https://api.browserbunny.dev/v1/tests/TEST_ID/cancel" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     test = client.tests.cancel("TEST_ID")
     print(test)
+```
+
+```bash cURL
+curl --fail-with-body -X POST "https://api.browserbunny.dev/v1/tests/TEST_ID/cancel" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 ```javascript JavaScript

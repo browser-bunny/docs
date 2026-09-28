@@ -20,22 +20,6 @@ This test checks the heading on `example.com` in Chrome on Windows, using the
 latest browser version available from AWS.
 
 <Tabs>
-<Tab title="cURL">
-
-Run in the same terminal with cURL 7.76 or newer:
-
-```bash
-curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
-  -H "Content-Type: application/json" \
-  --data '{
-  "start_url": "https://example.com",
-  "instructions": "Verify that the page heading is Example Domain.",
-  "devices": ["desktop-chrome"]
-}'
-```
-
-</Tab>
 <Tab title="Python">
 
 Install the client with Python 3.10 or newer:
@@ -56,6 +40,22 @@ with BrowserBunny() as client:
         devices=["desktop-chrome"],
     )
     print(test)
+```
+
+</Tab>
+<Tab title="cURL">
+
+Run in the same terminal with cURL 7.76 or newer:
+
+```bash
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{
+  "start_url": "https://example.com",
+  "instructions": "Verify that the page heading is Example Domain.",
+  "devices": ["desktop-chrome"]
+}'
 ```
 
 </Tab>

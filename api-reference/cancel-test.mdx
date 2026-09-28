@@ -5,17 +5,17 @@ openapi: "/openapi/public-v1.json POST /v1/tests/{test_id}/cancel"
 
 <RequestExample>
 
-```bash cURL
-curl --fail-with-body -X POST "https://api.browserbunny.dev/v1/tests/TEST_ID/cancel" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
 ```python Python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
     test = client.tests.cancel("TEST_ID")
     print(test)
+```
+
+```bash cURL
+curl --fail-with-body -X POST "https://api.browserbunny.dev/v1/tests/TEST_ID/cancel" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
 ```javascript JavaScript
