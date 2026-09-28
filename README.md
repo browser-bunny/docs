@@ -70,7 +70,7 @@ contract. MCP creation exposes only `start_url`, `instructions`, and `devices`. 
 Verify discovery and a real tool call before changing connection guidance.
 
 The agent setup page offers Cursor and VS Code install links, with manual
-configuration collapsed below each client. Install links contain only an
+configuration open by default below each client. Install links contain only an
 environment-variable reference or a masked input prompt, never an API key.
 When changing the MCP endpoint, regenerate the encoded install-link payloads
 and verify they match the manual configuration as well as the live server.
