@@ -63,7 +63,7 @@ retain Mintlify's native Markdown copying and success feedback.
 test MCP and `client-setup/humans.mdx` for direct API clients. The test endpoint is
 `https://api.browserbunny.dev/v1/mcp` and uses the same project API keys as REST.
 It exposes tools with input/output schemas derived from the live HTTP
-contract. MCP create submissions require `idempotency_key` for safe retries.
+contract. MCP creation exposes only `start_url`, `instructions`, and `devices`. After an uncertain submission, inspect existing tests before creating another.
 Verify discovery and a real tool call before changing connection guidance.
 
 Mintlify's `https://browserbunny.dev/docs/mcp` remains an optional documentation

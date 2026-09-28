@@ -4,9 +4,10 @@ This Mintlify site documents the production public API and Python SDK. Its sourc
 is this repository; `main` publishes to https://browserbunny.dev/docs.
 
 - Use active voice, second person, concise sentences, and sentence-case headings.
-- Use `instructions`, `start_url`, `devices`, `environments`, and `files` for HTTP submissions.
+- Use only `start_url`, `instructions`, and `devices` for HTTP submissions.
   Describe only the supported API; do not add compatibility aliases or old fields.
-- `devices` and `environments` are mutually exclusive. Device names select the latest AWS browser release.
+- `devices` is a list of supported names from GET /v1/devices; each uses the latest AWS browser release.
+- Upload URLs and supported conditions belong in instructions.
 - The SDK sends the same selectors as HTTP. Describe one test with
   one execution per environment, and one status field for both progress and result.
 - The backend owns OpenAPI. Regenerate `openapi/public-v1.json` using

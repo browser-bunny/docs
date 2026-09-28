@@ -23,8 +23,9 @@ export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 | --- | --- |
 | `start_url` | The public HTTPS page where the test starts |
 | `instructions` | What to do and what to verify |
+| `devices` | Optional list of supported device names |
 
-Omit both `devices` and `environments` to use Windows desktop Chrome with the latest release
+Omit `devices` to use Windows desktop Chrome with the latest release
 available from AWS.
 
 <CodeGroup>
@@ -33,10 +34,10 @@ available from AWS.
 curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
   -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "Idempotency-Key: first-homepage-test-001" \
   --data '{
   "start_url": "https://example.com",
-  "instructions": "Verify that the page heading is Example Domain."
+  "instructions": "Verify that the page heading is Example Domain.",
+    "devices": ["desktop-chrome"]
 }'
 ```
 
@@ -47,7 +48,7 @@ with BrowserBunny() as client:
     test = client.tests.create(
         start_url='https://example.com',
         instructions='Verify that the page heading is Example Domain.',
-        idempotency_key="first-homepage-test-001",
+        devices=['desktop-chrome'],
     )
     print(test)
 ```
@@ -57,12 +58,12 @@ const response = await fetch("https://api.browserbunny.dev/v1/tests", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`,
-    "Content-Type": "application/json",
-    "Idempotency-Key": "first-homepage-test-001"
+    "Content-Type": "application/json"
   },
   body: JSON.stringify({
     "start_url": "https://example.com",
-    "instructions": "Verify that the page heading is Example Domain."
+    "instructions": "Verify that the page heading is Example Domain.",
+    "devices": ["desktop-chrome"]
   })
 });
 const test = await response.json();
@@ -157,7 +158,7 @@ For field details and mixed results, see [results, logs, and usage](/results).
 ## Next steps
 
 <CardGroup cols={2}>
-  <Card title="Choose environments" icon="monitor" href="/environments">
+  <Card title="Choose devices" icon="monitor" href="/devices">
     Select the browsers and releases to test.
   </Card>
   <Card title="Upload files" icon="upload" href="/files">

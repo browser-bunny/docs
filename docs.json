@@ -32,7 +32,7 @@
           {
             "group": "Write and follow tests",
             "pages": [
-              "environments",
+              "devices",
               "conditions",
               "files",
               "results",
@@ -46,9 +46,9 @@
         "tab": "API reference",
         "groups": [
           {
-            "group": "Environments",
+            "group": "Devices",
             "pages": [
-              "api-reference/list-environments"
+              "api-reference/list-devices"
             ]
           },
           {

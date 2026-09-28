@@ -23,10 +23,10 @@ Use `Idempotency-Key` on `POST /v1/tests` when a submission may need to be retri
 | Same key with changed input | HTTP `409` |
 
 The replay comparison includes the starting URL, trimmed instructions, resolved
-environments, project, and nonempty file list. File order matters.
+devices and project.
 
-**Release versions can change.** Separate tests using `latest` or `previous` can
-resolve to different installed versions. Compare `actual_environment` when reviewing results.
+**Release versions can change.** Separate tests can use different installed
+versions as AWS updates its browsers. Compare `actual_environment` when reviewing results.
 
 ## Handle request errors
 
@@ -61,7 +61,7 @@ Application-generated errors have this structure:
 | `403` | Permission or origin rejected. Check credentials and request origin. |
 | `404` | Test or execution is inaccessible. Check the IDs and project key. |
 | `409` | Idempotency conflict or minutes pending settlement. Restore original inputs or wait for settlement. |
-| `422` | Invalid input. Correct the indicated field, URL, environment, or query. |
+| `422` | Invalid input. Correct the indicated field, URL, device name, or query. |
 | `429` | AWS account or service throttling. Honor `Retry-After` when returned and back off. |
 | `500` | Unexpected service error. Retain `request_id` and the submission key before retrying. |
 | `503` | Backing service unavailable. Retry reads; retain the original key for submission retries. |
@@ -92,7 +92,7 @@ See [results](/results) to distinguish request errors, execution errors, and web
 | --- | --- |
 | `start_url` | 8–2,000 characters; public HTTPS without credentials or private addresses |
 | `instructions` | 5–3,000 characters; minimum also applies after trimming |
-| `environments` | Nonempty when supplied; distinct supported combinations after defaults |
+| `devices` | Nonempty when supplied; distinct supported names |
 | File source URL | At most 2,000 characters per URL |
 
 ## Execution and transfer limits

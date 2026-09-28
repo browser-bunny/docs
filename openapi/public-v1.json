@@ -102,52 +102,43 @@
         "title": "Assertion",
         "type": "object"
       },
-      "AvailableEnvironment": {
+      "AvailableDevice": {
         "additionalProperties": false,
         "properties": {
           "browser": {
-            "default": "chrome",
-            "description": "Browser family.",
             "enum": [
               "chrome",
-              "firefox",
-              "edge"
+              "edge",
+              "firefox"
             ],
             "title": "Browser",
-            "type": "string"
-          },
-          "browser_version": {
-            "default": "latest",
-            "description": "Latest browser release available from AWS, or the preceding release.",
-            "enum": [
-              "latest",
-              "previous"
-            ],
-            "title": "Browser Version",
             "type": "string"
           },
           "capabilities": {
             "$ref": "#/components/schemas/EnvironmentCapabilities"
           },
-          "device": {
-            "const": "desktop",
-            "default": "desktop",
-            "description": "Device category.",
-            "title": "Device",
+          "name": {
+            "enum": [
+              "desktop-chrome",
+              "desktop-edge",
+              "desktop-firefox"
+            ],
+            "title": "Name",
             "type": "string"
           },
           "os": {
             "const": "windows",
-            "default": "windows",
-            "description": "Operating system. AWS manages its version.",
             "title": "Os",
             "type": "string"
           }
         },
         "required": [
+          "name",
+          "os",
+          "browser",
           "capabilities"
         ],
-        "title": "AvailableEnvironment",
+        "title": "AvailableDevice",
         "type": "object"
       },
       "Billing": {
@@ -507,6 +498,36 @@
         "title": "Conditions",
         "type": "object"
       },
+      "DevicesResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AvailableDevice"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "default": {
+            "items": {
+              "enum": [
+                "desktop-chrome",
+                "desktop-edge",
+                "desktop-firefox"
+              ],
+              "type": "string"
+            },
+            "title": "Default",
+            "type": "array"
+          }
+        },
+        "required": [
+          "default",
+          "data"
+        ],
+        "title": "DevicesResponse",
+        "type": "object"
+      },
       "Environment": {
         "additionalProperties": false,
         "description": "A supported, on-demand AWS Device Farm desktop browser.",
@@ -575,41 +596,6 @@
           "network_capture"
         ],
         "title": "EnvironmentCapabilities",
-        "type": "object"
-      },
-      "EnvironmentsResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "data": {
-            "items": {
-              "$ref": "#/components/schemas/AvailableEnvironment"
-            },
-            "title": "Data",
-            "type": "array"
-          },
-          "default": {
-            "$ref": "#/components/schemas/Environment"
-          },
-          "devices": {
-            "description": "Names accepted by devices when creating a test. Each selects the latest AWS browser release.",
-            "items": {
-              "enum": [
-                "desktop-chrome",
-                "desktop-edge",
-                "desktop-firefox"
-              ],
-              "type": "string"
-            },
-            "title": "Devices",
-            "type": "array"
-          }
-        },
-        "required": [
-          "default",
-          "devices",
-          "data"
-        ],
-        "title": "EnvironmentsResponse",
         "type": "object"
       },
       "ErrorDetail": {
@@ -1796,13 +1782,6 @@
             "title": "Executions",
             "type": "array"
           },
-          "files": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Files",
-            "type": "array"
-          },
           "finished_at": {
             "anyOf": [
               {
@@ -1889,7 +1868,6 @@
           "status",
           "start_url",
           "instructions",
-          "files",
           "executions",
           "execution_counts",
           "created_at",
@@ -1993,15 +1971,9 @@
       },
       "TestRequest": {
         "additionalProperties": false,
-        "not": {
-          "required": [
-            "devices",
-            "environments"
-          ]
-        },
         "properties": {
           "devices": {
-            "description": "Device names from GET /v1/environments. One execution per name, using the latest browser release available from AWS. Mutually exclusive with environments.",
+            "description": "Device names from GET /v1/devices. One execution per name, using the latest browser release available from AWS. Defaults to [\"desktop-chrome\"].",
             "items": {
               "enum": [
                 "desktop-chrome",
@@ -2015,35 +1987,8 @@
             "type": "array",
             "uniqueItems": true
           },
-          "environments": {
-            "description": "Explicit browser/version configurations, mutually exclusive with devices. Omit both selectors for Windows desktop, Chrome, latest. Discover supported choices with GET /v1/environments.",
-            "items": {
-              "$ref": "#/components/schemas/Environment"
-            },
-            "minItems": 1,
-            "title": "Environments",
-            "type": "array"
-          },
-          "files": {
-            "anyOf": [
-              {
-                "items": {
-                  "description": "Public HTTPS URL, validated again before each download connection.",
-                  "maxLength": 2000,
-                  "minLength": 1,
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Public HTTPS upload source URLs selected by the agent from the natural instructions. No admission-time download.",
-            "title": "Files"
-          },
           "instructions": {
-            "description": "What to do and verify, in ordinary language. May include supported network, locale and timezone conditions. Whitespace is trimmed when stored.",
+            "description": "What to do and verify, in ordinary language. Include public HTTPS file URLs for uploads and any supported network, locale or timezone conditions.",
             "maxLength": 3000,
             "minLength": 5,
             "title": "Instructions",
@@ -2102,15 +2047,15 @@
   },
   "openapi": "3.1.0",
   "paths": {
-    "/v1/environments": {
+    "/v1/devices": {
       "get": {
-        "operationId": "listEnvironments",
+        "operationId": "listDevices",
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EnvironmentsResponse"
+                  "$ref": "#/components/schemas/DevicesResponse"
                 }
               }
             },
@@ -2277,9 +2222,9 @@
             "BearerAuth": []
           }
         ],
-        "summary": "List environments",
+        "summary": "List devices",
         "tags": [
-          "Environments"
+          "Tests"
         ]
       }
     },

@@ -22,10 +22,10 @@ export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 </Tab>
 <Tab title="Python">
 
-Use Python 3.10 or newer. Install the hosted client package, version 0.11.0:
+Use Python 3.10 or newer. Install the hosted client package, version 0.12.0:
 
 ```bash
-python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.11.0-py3-none-any.whl
+python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.12.0-py3-none-any.whl
 export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 ```
 
@@ -72,7 +72,7 @@ Set the base URL explicitly. `--max-time` limits the request to 30 seconds:
 ```bash
 export BROWSERBUNNY_BASE_URL="https://api.browserbunny.dev"
 curl --fail-with-body --max-time 30 \
-  "$BROWSERBUNNY_BASE_URL/v1/environments" \
+  "$BROWSERBUNNY_BASE_URL/v1/devices" \
   -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
 
@@ -83,7 +83,7 @@ curl --fail-with-body --max-time 30 \
 from browserbunny import BrowserBunny
 
 with BrowserBunny(timeout=30) as client:
-    print(client.environments.list())
+    print(client.devices.list())
 ```
 
 - **API key:** `api_key` reads `BROWSERBUNNY_API_KEY` when omitted. An explicit key
@@ -97,7 +97,7 @@ Set the base URL explicitly and pass an abort signal for a 30-second timeout:
 
 ```javascript
 const baseUrl = "https://api.browserbunny.dev";
-const response = await fetch(`${baseUrl}/v1/environments`, {
+const response = await fetch(`${baseUrl}/v1/devices`, {
   headers: { Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}` },
   signal: AbortSignal.timeout(30_000)
 });
@@ -157,8 +157,8 @@ with BrowserBunny() as client:
 
 **Submission retries**
 
-- Pass your own `idempotency_key` for CI jobs and uncertain retries.
-- Omitting the key generates a fresh one.
+- Each create call generates a fresh request key.
+- After an uncertain submission, inspect `tests.list()` before submitting again.
 - POST requests are never retried automatically.
 
 **Exception types**
@@ -191,7 +191,7 @@ Call these methods on a `BrowserBunny` client:
 
 | Method | Behavior |
 | --- | --- |
-| `environments.list()` | Discover environments and capabilities |
+| `devices.list()` | Discover devices and capabilities |
 | `tests.create()` | Create an accepted test |
 | `tests.get()` | Read a test and its executions |
 | `tests.report()` | Read structured findings and Markdown for a bug handoff |
@@ -205,9 +205,8 @@ Call these methods on a `BrowserBunny` client:
 **Arguments**
 
 - `tests.create()`: requires `start_url` and `instructions`; optionally accepts
-  `devices`, `environments`, `files`, and `idempotency_key` as keyword arguments.
-  Use `devices` for latest-browser targets or `environments` for explicit versions;
-  the two selectors are mutually exclusive.
+  `devices` as a list of names. These are its only three arguments.
+  Include upload URLs and supported conditions directly in `instructions`.
 - `tests.get()` and `tests.cancel()`: require `test_id`.
 - `tests.report()`: requires `test_id`; optional keyword argument `execution_id`
   selects one execution.

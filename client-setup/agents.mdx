@@ -3,7 +3,7 @@ title: "For agents"
 description: "Connect your coding agent to create browser tests, inspect results, and cancel work through MCP."
 ---
 
-Connect once with your project API key. Your agent can discover environments,
+Connect once with your project API key. Your agent can discover devices,
 create tests, read results and logs, prepare bug reports, and request cancellation through MCP.
 
 ## Before you start
@@ -12,7 +12,7 @@ create tests, read results and logs, prepare bug reports, and request cancellati
 2. Make sure the account has test minutes before creating tests.
 3. Choose an MCP client that supports Streamable HTTP and an Authorization header.
 
-The key selects the project. Discovering environments and reading results do not
+The key selects the project. Discovering devices and reading results do not
 start a browser or consume test minutes.
 
 ## Connect the server
@@ -157,7 +157,7 @@ the key without storing its value in the file.
 Ask your agent:
 
 ```text
-Use BrowserBunny's list_environments tool and tell me which browsers
+Use BrowserBunny's list_devices tool and tell me which browsers
 and versions are available. Do not create a test yet.
 ```
 
@@ -165,7 +165,7 @@ A working connection exposes these tools:
 
 | Tool | What it does |
 | --- | --- |
-| `list_environments` | Discover supported browsers, versions, and capabilities |
+| `list_devices` | Discover supported device names and capabilities |
 | `create_test` | Submit a test and return its ID |
 | `list_tests` | List tests in your project |
 | `get_test` | Read status, execution checks, errors, and dashboard links |
@@ -182,8 +182,8 @@ Give your agent this task:
 Use BrowserBunny to create a test for https://example.com with these
 instructions: "Verify that the page heading is Example Domain."
 
-Use the default environment. Generate an idempotency key for this
-submission and keep the same key if you need to retry it.
+Use devices: ["desktop-chrome"]. If submission is uncertain, inspect
+list_tests before creating another test.
 
 Retain the returned test ID. Poll get_test about every two seconds
 until terminal, then report the status, checks, and dashboard URL.
@@ -197,14 +197,14 @@ until terminal, then report the status, checks, and dashboard URL.
 | --- | --- |
 | `start_url` | Required public HTTPS starting page |
 | `instructions` | Required actions and checks in ordinary language |
-| `devices` | Optional target names using the latest AWS browser release; mutually exclusive with `environments` |
-| `environments` | Optional explicit browser selections; omit both selectors for Windows Chrome `latest` |
-| `files` | Optional list of public HTTPS file URLs |
-| `idempotency_key` | Required for MCP submissions; unique to the intended test |
+| `devices` | Optional nonempty list of distinct device names; defaults to `["desktop-chrome"]` |
 
-An idempotency key must be 8–128 characters using letters, numbers, `_`, `.`, `:`,
-or `-`. Reuse the key and all inputs after an uncertain response. Reusing it with
-changed inputs returns `conflict`. A new intended test needs a new key.
+These are the only three creation fields. Include upload URLs and supported
+conditions directly in `instructions`. The service selects the latest browser
+release AWS offers for each device.
+
+After an uncertain submission, inspect `list_tests` before submitting again.
+Each new `create_test` call can create another paid test.
 
 ### Follow results
 
@@ -247,6 +247,6 @@ Use the setup above for creating and managing tests.
 
 ## Next steps
 
-- [Choose environments](/environments): select browsers and versions.
+- [Choose devices](/devices): select devices by name.
 - [Upload files](/files): provide upload sources in test instructions.
 - [Network and language conditions](/conditions): describe the conditions to test.
