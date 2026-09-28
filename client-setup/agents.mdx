@@ -197,7 +197,8 @@ until terminal, then report the status, checks, and dashboard URL.
 | --- | --- |
 | `start_url` | Required public HTTPS starting page |
 | `instructions` | Required actions and checks in ordinary language |
-| `environments` | Optional browser selections; defaults to Windows Chrome `latest` |
+| `devices` | Optional target names using the latest AWS browser release; mutually exclusive with `environments` |
+| `environments` | Optional explicit browser selections; omit both selectors for Windows Chrome `latest` |
 | `files` | Optional list of public HTTPS file URLs |
 | `idempotency_key` | Required for MCP submissions; unique to the intended test |
 

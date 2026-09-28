@@ -22,10 +22,10 @@ export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 </Tab>
 <Tab title="Python">
 
-Use Python 3.10 or newer. Install the hosted client package, version 0.10.0:
+Use Python 3.10 or newer. Install the hosted client package, version 0.11.0:
 
 ```bash
-python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.10.0-py3-none-any.whl
+python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.11.0-py3-none-any.whl
 export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 ```
 
@@ -205,7 +205,9 @@ Call these methods on a `BrowserBunny` client:
 **Arguments**
 
 - `tests.create()`: requires `start_url` and `instructions`; optionally accepts
-  `environments`, `files`, and `idempotency_key` as keyword arguments.
+  `devices`, `environments`, `files`, and `idempotency_key` as keyword arguments.
+  Use `devices` for latest-browser targets or `environments` for explicit versions;
+  the two selectors are mutually exclusive.
 - `tests.get()` and `tests.cancel()`: require `test_id`.
 - `tests.report()`: requires `test_id`; optional keyword argument `execution_id`
   selects one execution.

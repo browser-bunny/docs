@@ -589,10 +589,24 @@
           },
           "default": {
             "$ref": "#/components/schemas/Environment"
+          },
+          "devices": {
+            "description": "Names accepted by devices when creating a test. Each selects the latest AWS browser release.",
+            "items": {
+              "enum": [
+                "desktop-chrome",
+                "desktop-edge",
+                "desktop-firefox"
+              ],
+              "type": "string"
+            },
+            "title": "Devices",
+            "type": "array"
           }
         },
         "required": [
           "default",
+          "devices",
           "data"
         ],
         "title": "EnvironmentsResponse",
@@ -1979,9 +1993,30 @@
       },
       "TestRequest": {
         "additionalProperties": false,
+        "not": {
+          "required": [
+            "devices",
+            "environments"
+          ]
+        },
         "properties": {
+          "devices": {
+            "description": "Device names from GET /v1/environments. One execution per name, using the latest browser release available from AWS. Mutually exclusive with environments.",
+            "items": {
+              "enum": [
+                "desktop-chrome",
+                "desktop-edge",
+                "desktop-firefox"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Devices",
+            "type": "array",
+            "uniqueItems": true
+          },
           "environments": {
-            "description": "One execution per environment. Defaults to Windows desktop, Chrome, latest. Discover supported choices with GET /v1/environments.",
+            "description": "Explicit browser/version configurations, mutually exclusive with devices. Omit both selectors for Windows desktop, Chrome, latest. Discover supported choices with GET /v1/environments.",
             "items": {
               "$ref": "#/components/schemas/Environment"
             },
