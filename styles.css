@@ -68,6 +68,39 @@ a.bb-install-button {
 
 a.bb-install-button:hover { filter: brightness(1.1); }
 
+/* Setup actions and endpoint cards are explicit navigation controls. */
+a.bb-doc-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--bb-border);
+  border-radius: 8px;
+  background: var(--bb-surface);
+  color: #fff !important;
+  font-weight: 400;
+  text-decoration: none !important;
+}
+
+a.bb-doc-action:hover { border-color: var(--bb-accent); }
+
+.bb-reference-card {
+  border-color: var(--bb-border);
+  text-decoration: none !important;
+}
+
+.bb-reference-card h2, .bb-reference-card h3 {
+  font-weight: 500;
+}
+
+.bb-reference-card:hover { border-color: var(--bb-accent); }
+
+.bb-reference-primary {
+  border-color: var(--bb-accent);
+  background: rgb(234 141 255 / 6%);
+}
+
 /* Keep Mintlify's native page-copy action visible and easy to tap. */
 #page-context-menu-button {
   min-height: 44px;

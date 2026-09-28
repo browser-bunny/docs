@@ -5,8 +5,11 @@ description: "Create an API key, run your first test, and review the result."
 
 ## 1. Create an API key
 
-1. Open the [dashboard](https://dash.browserbunny.dev).
-2. Create an API key for your account, then set it in your terminal:
+Create an API key in your dashboard.
+
+<a className="bb-doc-action" href="https://dash.browserbunny.dev">Open dashboard <span aria-hidden="true">↗</span></a>
+
+Set the key in your terminal:
 
 ```bash
 export BROWSERBUNNY_API_KEY="YOUR_API_KEY"
@@ -93,27 +96,39 @@ console.log(test);
 
 ## 3. Review the result
 
-A successful response (`202`) means your test was accepted. Browser work continues
-in the background.
+Tests run asynchronously. An HTTP `202` response confirms acceptance.
+Save the returned `id`. Open the returned `url` to follow the test in your dashboard.
 
-- **Save `id`:** use it to [read the test](/api-reference/get-test) later.
-- **Open `url`:** sign in to see the result, checks, and session evidence in the dashboard.
-- **Found a bug?** [Get a bug report](/api-reference/get-test-report) to share with your coding agent.
+To use the results in your code, open an endpoint below.
 
-For polling and status meanings, see [follow a test](/results).
-If submission fails, check [errors and limits](/errors-and-limits).
-If the response is lost, check [recent tests](/api-reference/list-tests) before submitting again.
+<CardGroup cols={2}>
+  <Card title="Read test results" icon="list-checks" href="/api-reference/get-test" cta="View API reference" arrow={true} className="bb-reference-card">
+    Fetch the test's status, checks, and session links using its ID.
+  </Card>
+  <Card title="Get a bug report" icon="bug" href="/api-reference/get-test-report" cta="View API reference" arrow={true} className="bb-reference-card">
+    Get findings and reproduction steps to share with your coding agent.
+  </Card>
+</CardGroup>
 
-## Client methods
+## API reference
 
-Each reference page has inputs, responses, and examples in your chosen language.
+<Card title="Explore the API" icon="braces" href="/api-reference/create-test" cta="Open API reference" arrow={true} className="bb-reference-card bb-reference-primary">
+  Request fields, response schemas, and code examples for every endpoint.
+  Discover devices, create tests, inspect results, and cancel work.
+</Card>
 
-| Action | Request |
-| --- | --- |
-| [Find devices](/api-reference/list-devices) | `GET /v1/devices` |
-| [Create a test](/api-reference/create-test) | `POST /v1/tests` |
-| [Read a test](/api-reference/get-test) | `GET /v1/tests/{test_id}` |
-| [Get a bug report](/api-reference/get-test-report) | `GET /v1/tests/{test_id}/report` |
-| [Cancel a test](/api-reference/cancel-test) | `POST /v1/tests/{test_id}/cancel` |
+<Accordion title="Polling and retries">
 
-[Choose devices](/devices) · [Upload files](/files) · [Set test conditions](/conditions)
+Poll with the saved test ID about every two seconds until the test finishes.
+If a submission response is lost, list recent tests before creating another.
+
+<CardGroup cols={2}>
+  <Card title="Follow a test" href="/results" cta="Read the guide" arrow={true} className="bb-reference-card">
+    Status meanings, polling, and result details.
+  </Card>
+  <Card title="Handle errors" href="/errors-and-limits" cta="Read the guide" arrow={true} className="bb-reference-card">
+    Failed requests, retries, and usage limits.
+  </Card>
+</CardGroup>
+
+</Accordion>
