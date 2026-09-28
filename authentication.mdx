@@ -1,17 +1,16 @@
 ---
-title: "Authentication and projects"
-description: "Use a project API key to create tests and access their results."
+title: "Authentication"
+description: "Use an API key to create tests and access their results."
 ---
 
-## Create a project key
+## Create an API key
 
-1. Select a project in the [dashboard](https://dash.browserbunny.dev). Every account
-   starts with a **Default** project.
-2. Create or copy an API key for that project.
+1. Sign in to the [dashboard](https://dash.browserbunny.dev).
+2. Create or copy an API key for your account.
 3. Store it in `BROWSERBUNNY_API_KEY` in your server environment or CI secret store.
 
-The key determines where tests are created and which tests you can read, cancel,
-or inspect. Continue to [your first test](/client-setup/humans#2-create-your-first-test).
+The key grants access to all tests in its owning account. You can create tests,
+read results, cancel tests, and inspect evidence. Continue to [your first test](/client-setup/humans#2-create-your-first-test).
 
 ## Verify access
 
@@ -52,8 +51,8 @@ Send all API requests to `https://api.browserbunny.dev`.
 
 ## Understand access
 
-- **Project access:** use a different project's key to switch projects. The create
-  request does not accept `project_id`.
+- **Account access:** every active key can access all tests owned by its account.
+  A key cannot access another account’s tests.
 - **API authentication:** dashboard cookies do not authenticate `/v1` requests.
 - **Dashboard links:** test and session URLs require sign-in to the owning account.
 - **Test minutes:** an API key does not provide minutes. Submission can be rejected

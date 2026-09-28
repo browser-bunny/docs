@@ -64,14 +64,14 @@ test MCP and `client-setup/humans.mdx` for direct API clients. The human path is
 the single first-test walkthrough: create a key, create a test, then review the
 result. `/quickstart` redirects there. Keep `index.mdx` as a brief product overview
 without repeating setup steps or code. The test endpoint is
-`https://api.browserbunny.dev/v1/mcp` and uses the same project API keys as REST.
+`https://api.browserbunny.dev/v1/mcp` and uses the same API keys as REST.
 It exposes tools with input/output schemas derived from the live HTTP
 contract. MCP creation exposes only `start_url`, `instructions`, and `devices`. After an uncertain submission, inspect existing tests before creating another.
 Verify discovery and a real tool call before changing connection guidance.
 
 Mintlify's `https://browserbunny.dev/docs/mcp` remains an optional documentation
 search server. Its page-menu shortcuts connect to documentation, not test tools.
-Never send project API keys to the public documentation MCP.
+Never send API keys to the public documentation MCP.
 
 ## Release workflow
 

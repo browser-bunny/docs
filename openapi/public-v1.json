@@ -1803,14 +1803,6 @@
             "title": "Instructions",
             "type": "string"
           },
-          "project_id": {
-            "title": "Project Id",
-            "type": "string"
-          },
-          "project_name": {
-            "title": "Project Name",
-            "type": "string"
-          },
           "start_url": {
             "title": "Start Url",
             "type": "string"
@@ -1863,8 +1855,6 @@
         },
         "required": [
           "id",
-          "project_id",
-          "project_name",
           "status",
           "start_url",
           "instructions",
@@ -2034,7 +2024,7 @@
     },
     "securitySchemes": {
       "BearerAuth": {
-        "description": "Project API key. The key determines the account and project.",
+        "description": "Account API key. The key determines the account.",
         "scheme": "bearer",
         "type": "http"
       }
@@ -2127,7 +2117,7 @@
                 }
               }
             },
-            "description": "Resource not found in this project.",
+            "description": "Resource not found in this account.",
             "headers": {
               "X-Request-ID": {
                 "description": "Application request identifier for support, when provided.",
@@ -2339,7 +2329,7 @@
                 }
               }
             },
-            "description": "Resource not found in this project.",
+            "description": "Resource not found in this account.",
             "headers": {
               "X-Request-ID": {
                 "description": "Application request identifier for support, when provided.",
@@ -2576,7 +2566,7 @@
                 }
               }
             },
-            "description": "Resource not found in this project.",
+            "description": "Resource not found in this account.",
             "headers": {
               "X-Request-ID": {
                 "description": "Application request identifier for support, when provided.",
@@ -2786,7 +2776,7 @@
                 }
               }
             },
-            "description": "Resource not found in this project.",
+            "description": "Resource not found in this account.",
             "headers": {
               "X-Request-ID": {
                 "description": "Application request identifier for support, when provided.",
@@ -2978,7 +2968,7 @@
                 }
               }
             },
-            "description": "Resource not found in this project.",
+            "description": "Resource not found in this account.",
             "headers": {
               "X-Request-ID": {
                 "description": "Application request identifier for support, when provided.",
@@ -3218,7 +3208,7 @@
                 }
               }
             },
-            "description": "Resource not found in this project.",
+            "description": "Resource not found in this account.",
             "headers": {
               "X-Request-ID": {
                 "description": "Application request identifier for support, when provided.",
@@ -3456,7 +3446,7 @@
                 }
               }
             },
-            "description": "Resource not found in this project.",
+            "description": "Resource not found in this account.",
             "headers": {
               "X-Request-ID": {
                 "description": "Application request identifier for support, when provided.",
@@ -3665,7 +3655,7 @@
                 }
               }
             },
-            "description": "Resource not found in this project.",
+            "description": "Resource not found in this account.",
             "headers": {
               "X-Request-ID": {
                 "description": "Application request identifier for support, when provided.",

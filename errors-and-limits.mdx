@@ -40,10 +40,10 @@ Application-generated errors have this structure:
 
 | Status | Cause and next action |
 | --- | --- |
-| `401` | Missing or invalid key. Use an active project key. |
+| `401` | Missing or invalid key. Use an active API key. |
 | `402` | Minutes or billing readiness required. Review account minutes and the error message. |
 | `403` | Permission or origin rejected. Check credentials and request origin. |
-| `404` | Test or execution is inaccessible. Check the IDs and project key. |
+| `404` | Test or execution is inaccessible. Check the IDs and API key. |
 | `409` | The request conflicts with the current state, or minutes are pending settlement. Read the error message before trying again. |
 | `422` | Invalid input. Correct the indicated field, URL, device name, or query. |
 | `429` | AWS account or service throttling. Honor `Retry-After` when returned and back off. |
