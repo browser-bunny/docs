@@ -47,9 +47,9 @@ inside the matching tab on `client-setup/humans.mdx`. JSON response examples sta
 
 Structure guides for mobile scanning: use task headings, numbered steps for
 workflows, labeled bullets for independent rules, and narrow tables for field or
-status definitions. Separate active and terminal statuses. Keep detailed client
-methods in an accordion and next actions in linked cards or a short list. Avoid
-paragraphs that combine status enums, field definitions, and unrelated caveats.
+status definitions. Separate active and terminal statuses. Keep the client-method
+overview short and link to endpoint references for arguments and response details.
+Avoid paragraphs that combine status enums, field definitions, and unrelated caveats.
 Keep reference-page parameters and responses generated from OpenAPI.
 
 Keep the native Copy Page action enabled first in `contextual.options` and set
@@ -60,7 +60,10 @@ retain Mintlify's native Markdown copying and success feedback.
 ## Setup paths
 
 `client-setup.mdx` offers two paths: `client-setup/agents.mdx` for the authenticated
-test MCP and `client-setup/humans.mdx` for direct API clients. The test endpoint is
+test MCP and `client-setup/humans.mdx` for direct API clients. The human path is
+the single first-test walkthrough: create a key, create a test, then review the
+result. `/quickstart` redirects there. Keep `index.mdx` as a brief product overview
+without repeating setup steps or code. The test endpoint is
 `https://api.browserbunny.dev/v1/mcp` and uses the same project API keys as REST.
 It exposes tools with input/output schemas derived from the live HTTP
 contract. MCP creation exposes only `start_url`, `instructions`, and `devices`. After an uncertain submission, inspect existing tests before creating another.

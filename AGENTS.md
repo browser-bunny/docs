@@ -11,7 +11,10 @@ is this repository; `main` publishes to https://browserbunny.dev/docs.
 - Device-discovery examples use default transport settings; do not add timeout arguments, curl max-time flags, or abort signals.
 - Request deduplication keys are internal SDK transport details, not public setup steps or API-reference parameters.
 - The SDK sends the same selectors as HTTP. Describe one test with
-  one execution per environment, and one status field for both progress and result.
+  one execution per device, and one status field for both progress and result.
+- Keep one first-test walkthrough in `client-setup/humans.mdx`: API key first,
+  test code next, then results. `/quickstart` redirects there. The introduction
+  explains the product without repeating setup. Link to references for method details.
 - The backend owns OpenAPI. Regenerate `openapi/public-v1.json` using
   `../backend/scripts/export_public_openapi.py`; never hand-edit generated schemas.
 - Endpoint pages must reference the checked-in OpenAPI operation. Keep guides

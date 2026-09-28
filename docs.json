@@ -25,7 +25,6 @@
                   "client-setup/humans"
                 ]
               },
-              "quickstart",
               "authentication"
             ]
           },
@@ -126,5 +125,11 @@
       ],
       "autogenerate": false
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/quickstart",
+      "destination": "/client-setup/humans"
+    }
+  ]
 }

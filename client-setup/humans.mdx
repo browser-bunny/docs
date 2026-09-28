@@ -1,233 +1,119 @@
 ---
 title: "For humans"
-description: "Set up an API client and create your first browser test."
+description: "Create an API key, run your first test, and review the result."
 ---
 
-Build directly against the API with your preferred language. Requests use HTTPS
-and JSON; the request and response fields stay the same in every example.
+## 1. Create an API key
 
-## Prepare your client
+1. Open the [dashboard](https://dash.browserbunny.dev) and select a project.
+2. Create an API key for that project, then set it in your terminal:
+
+```bash
+export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
+```
+
+Keep the key on your server or in CI. Your account needs test minutes to run a test.
+
+## 2. Create your first test
+
+This test checks the heading on `example.com` in Chrome on Windows, using the
+latest browser version available from AWS.
 
 <Tabs>
 <Tab title="cURL">
 
-Use cURL 7.76 or newer for the `--fail-with-body` option shown in these guides.
-It preserves the response body and exits with an error for HTTP failures.
+Run in the same terminal with cURL 7.76 or newer:
 
 ```bash
-curl --version
-export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
+curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
+  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{
+  "start_url": "https://example.com",
+  "instructions": "Verify that the page heading is Example Domain.",
+  "devices": ["desktop-chrome"]
+}'
 ```
 
 </Tab>
 <Tab title="Python">
 
-Use Python 3.10 or newer. Install the hosted client package, version 0.12.0:
+Install the client with Python 3.10 or newer:
 
 ```bash
 python -m pip install --upgrade https://api.browserbunny.dev/downloads/browserbunny-0.12.0-py3-none-any.whl
-export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
 ```
 
-- **Connections:** the `BrowserBunny` context manager closes HTTP connections.
-- **Responses:** dictionaries with type hints.
-- **Inputs:** the client sends supplied fields without rewriting instructions or
-  downloading files.
-
-</Tab>
-<Tab title="JavaScript">
-
-- **Runtime:** a supported Node.js release with built-in `fetch`.
-- **File format:** save examples in an `.mjs` file for top-level `await`.
-- **Dependencies:** no additional package is required.
-
-```bash
-export BROWSERBUNNY_API_KEY="YOUR_PROJECT_API_KEY"
-node example.mjs
-```
-
-Examples run on your server or in CI. Keep your project key out of browser code.
-
-</Tab>
-</Tabs>
-
-### Set up access
-
-1. Select the project you want to access in the [dashboard](https://dash.browserbunny.dev).
-2. Create a key for that project.
-3. Send the key in the `Authorization: Bearer` header.
-
-See [authentication](/authentication) for project access.
-
-## Configure the connection
-
-- **API base URL:** `https://api.browserbunny.dev`.
-
-<Tabs>
-<Tab title="cURL">
-
-List the available devices:
-
-```bash
-export BROWSERBUNNY_BASE_URL="https://api.browserbunny.dev"
-curl --fail-with-body \
-  "$BROWSERBUNNY_BASE_URL/v1/devices" \
-  -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
-```
-
-</Tab>
-<Tab title="Python">
+Save as `test.py` and run `python test.py` in the same terminal:
 
 ```python
 from browserbunny import BrowserBunny
 
 with BrowserBunny() as client:
-    print(client.devices.list())
+    test = client.tests.create(
+        start_url="https://example.com",
+        instructions="Verify that the page heading is Example Domain.",
+        devices=["desktop-chrome"],
+    )
+    print(test)
 ```
-
-- **API key:** `api_key` reads `BROWSERBUNNY_API_KEY` when omitted. An explicit key
-  takes priority over the environment variable.
 
 </Tab>
 <Tab title="JavaScript">
 
-List the available devices:
+Use Node.js with built-in `fetch`. Save as `test.mjs` and run `node test.mjs`
+in the same terminal:
 
 ```javascript
-const baseUrl = "https://api.browserbunny.dev";
-const response = await fetch(`${baseUrl}/v1/devices`, {
-  headers: { Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}` }
+const response = await fetch("https://api.browserbunny.dev/v1/tests", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    start_url: "https://example.com",
+    instructions: "Verify that the page heading is Example Domain.",
+    devices: ["desktop-chrome"]
+  })
 });
-const catalog = await response.json();
-if (!response.ok) throw new Error(JSON.stringify(catalog));
-console.log(catalog);
+const test = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(test));
+console.log(test);
 ```
 
 </Tab>
 </Tabs>
 
-## Follow results and handle errors
-
-1. Create the test and retain its ID.
-2. Poll until it reaches a terminal status.
-3. If your local deadline expires, keep the ID and resume polling later.
-
-### Request and execution behavior
-
-- **Closed connection:** remote work continues.
-- **Uncertain submission:** check your recent tests before submitting again.
-- **HTTP error:** the API request failed.
-- **Execution error:** an accepted test could not complete preparation or execution.
-
-See [results](/results) for status and cancellation, and
-[errors and limits](/errors-and-limits) for rejected requests.
-
-<Tabs>
-<Tab title="cURL">
-
-- **HTTP errors:** use `--fail-with-body` and inspect the returned JSON.
-- **Polling:** request `GET /v1/tests/TEST_ID` about every two seconds until terminal.
-- **Retries:** check your recent tests after an uncertain create request.
-
-</Tab>
-<Tab title="Python">
-
-| Polling option | Default |
+| Input | What to provide |
 | --- | --- |
-| `poll_interval` | 2 seconds |
-| `timeout` | 900 seconds |
+| `start_url` | The public HTTPS page where the test starts |
+| `instructions` | What to do and what to verify |
+| `devices` | Device names to test; defaults to `["desktop-chrome"]` |
 
-On `TestTimeoutError`, retain `.test_id` and `.last_test` to resume later.
+## 3. Review the result
 
-```python
-from browserbunny import APIError, BrowserBunny, TestTimeoutError
+A successful response (`202`) means your test was accepted. Browser work continues
+in the background.
 
-with BrowserBunny() as client:
-    try:
-        result = client.tests.wait("TEST_ID", timeout=900, poll_interval=2)
-        print(result["status"], result["url"])
-    except TestTimeoutError as error:
-        print("Still pending:", error.test_id)
-    except APIError as error:
-        print(error.code, error.message, error.param, error.request_id)
-```
+- **Save `id`:** use it to [read the test](/api-reference/get-test) later.
+- **Open `url`:** sign in to see the result, checks, and session evidence in the dashboard.
+- **Found a bug?** [Get a bug report](/api-reference/get-test-report) to share with your coding agent.
 
-**Submission retries**
+For polling and status meanings, see [follow a test](/results).
+If submission fails, check [errors and limits](/errors-and-limits).
+If the response is lost, check [recent tests](/api-reference/list-tests) before submitting again.
 
-- Each create call submits a new test.
-- After an uncertain submission, inspect `tests.list()` before submitting again.
-- POST requests are never retried automatically.
+## Client methods
 
-**Exception types**
+Each reference page has inputs, responses, and examples in your chosen language.
 
-| Exception | Category |
+| Action | Request |
 | --- | --- |
-| `AuthenticationError` | Authentication failure |
-| `ValidationError` | Request validation failure |
-| `BillingError` | Billing or test-minute requirement |
-| `RateLimitError` | Request throttling |
-| `UnsupportedOperationError` | Unsupported operation |
-| `TransportError` | Request could not complete; its remote result may be unknown |
-| `ConfigurationError` | Client configuration issue |
+| [Find devices](/api-reference/list-devices) | `GET /v1/devices` |
+| [Create a test](/api-reference/create-test) | `POST /v1/tests` |
+| [Read a test](/api-reference/get-test) | `GET /v1/tests/{test_id}` |
+| [Get a bug report](/api-reference/get-test-report) | `GET /v1/tests/{test_id}/report` |
+| [Cancel a test](/api-reference/cancel-test) | `POST /v1/tests/{test_id}/cancel` |
 
-**Error details**
-
-- `status_code`: HTTP response status.
-- `code` and `message`: application error details, when available.
-- `param`: relevant parameter, when available.
-- `request_id`: support identifier, when available.
-- `retry_after`: retry guidance, when available.
-
-Gateway errors select an exception by HTTP status even when application fields
-are unavailable. Client errors inherit from `BrowserBunnyError`; invalid local
-argument shapes can raise `ValueError`.
-
-<Accordion title="Client methods">
-
-Call these methods on a `BrowserBunny` client:
-
-| Method | Behavior |
-| --- | --- |
-| `devices.list()` | Discover devices and capabilities |
-| `tests.create()` | Create an accepted test |
-| `tests.get()` | Read a test and its executions |
-| `tests.report()` | Read structured findings and Markdown for a bug handoff |
-| `tests.list()` | Read a page of project tests |
-| `tests.wait()` | Poll until terminal |
-| `tests.logs()` | Read a page of test logs |
-| `tests.network()` | Read an execution's network requests |
-| `tests.cancel()` | Request cancellation |
-| `close()` | Close HTTP connections |
-
-**Arguments**
-
-- `tests.create()`: requires `start_url` and `instructions`; optionally accepts
-  `devices` as a list of names. These are its only three arguments.
-  Include upload URLs and supported conditions directly in `instructions`.
-- `tests.get()` and `tests.cancel()`: require `test_id`.
-- `tests.report()`: requires `test_id`; optional keyword argument `execution_id`
-  selects one execution.
-- `tests.list()`: optional keyword arguments `cursor` and `limit` (default 50).
-- `tests.wait()`: requires `test_id`; optional keyword arguments `timeout`
-  (default 900) and `poll_interval` (default 2), both in seconds.
-- `tests.logs()`: requires `test_id`; optional keyword arguments `execution_id`,
-  `cursor`, and `limit` (default 200).
-- `tests.network()`: requires `test_id` and `execution_id`; optional keyword
-  arguments `errors_only` (default `False`), `cursor`, and `limit` (default 200).
-
-</Accordion>
-
-</Tab>
-<Tab title="JavaScript">
-
-- **HTTP failures:** `fetch` still resolves; check `response.ok` before using the result.
-- **Transport failures:** a rejected fetch or expired abort signal can leave the
-  submission's remote result unknown.
-- **Retries:** check your recent tests before submitting again.
-- **Polling:** request `GET /v1/tests/TEST_ID` about every two seconds until a
-  [terminal status](/results#terminal-statuses).
-
-</Tab>
-</Tabs>
-
-Continue with the [quickstart](/quickstart) to create a test.
+[Choose devices](/devices) · [Upload files](/files) · [Set test conditions](/conditions)

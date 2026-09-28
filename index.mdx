@@ -1,41 +1,29 @@
 ---
 title: "Browser tests, in your words."
 sidebarTitle: "Introduction"
-description: "Describe a user journey. Test it in real browsers and review the evidence."
+description: "Describe a user journey. Get browser results and evidence you can act on."
 ---
 
 <div className="bb-kicker">BROWSERBUNNY DOCUMENTATION</div>
 
 <p className="bb-intro">
-  Give BrowserBunny a starting URL and instructions in ordinary language.
-  Submit a test through the API, follow each browser execution,
-  and review its checks and session evidence.
+  BrowserBunny tests your website from instructions in ordinary language.
+  Give it a URL, describe what to do and verify, and choose your devices.
 </p>
 
+## What you get
+
+- **Results for each device:** checks that show what passed or failed.
+- **Evidence:** session recordings and logs to help explain what happened.
+- **Bug reports:** structured data for agents and Markdown you can paste into a coding tool.
+
+## Get started
+
 <CardGroup cols={2}>
-  <Card title="Set up BrowserBunny" icon="terminal" href="/client-setup" className="bb-card">
-    Choose the agent path with MCP or set up an API client yourself.
+  <Card title="For agents" icon="bot" href="/client-setup/agents" className="bb-card">
+    Connect through MCP to run tests and investigate bugs from your coding agent.
   </Card>
-  <Card title="Explore your dashboard" icon="monitor-play" href="https://dash.browserbunny.dev" className="bb-card">
-    Manage project keys and review tests, usage, and session recordings.
+  <Card title="For humans" icon="terminal" href="/client-setup/humans" className="bb-card">
+    Create an API key and run your first test in your preferred language.
   </Card>
 </CardGroup>
-
-## From instructions to evidence
-
-<Steps>
-  <Step title="Describe what to do and verify">
-    - Provide a public HTTPS starting URL.
-    - Describe the actions and expected result.
-    - Include supported conditions such as a 3G connection or Spanish browser language.
-  </Step>
-  <Step title="Choose devices">
-    - Use Windows Chrome by default, or select Chrome, Firefox, and Edge.
-    - Each selected device gets one execution of the same instructions.
-  </Step>
-  <Step title="Read the result">
-    - Follow the test until it finishes.
-    - Inspect each execution's status and checks.
-    - Open session evidence to review what happened.
-  </Step>
-</Steps>
