@@ -62,16 +62,15 @@ See [authentication](/authentication) for project access.
 ## Configure the connection
 
 - **API base URL:** `https://api.browserbunny.dev`.
-- **HTTP timeout:** limits a single request; it does not cancel an accepted test.
 
 <Tabs>
 <Tab title="cURL">
 
-Set the base URL explicitly. `--max-time` limits the request to 30 seconds:
+List the available devices:
 
 ```bash
 export BROWSERBUNNY_BASE_URL="https://api.browserbunny.dev"
-curl --fail-with-body --max-time 30 \
+curl --fail-with-body \
   "$BROWSERBUNNY_BASE_URL/v1/devices" \
   -H "Authorization: Bearer $BROWSERBUNNY_API_KEY"
 ```
@@ -82,24 +81,22 @@ curl --fail-with-body --max-time 30 \
 ```python
 from browserbunny import BrowserBunny
 
-with BrowserBunny(timeout=30) as client:
+with BrowserBunny() as client:
     print(client.devices.list())
 ```
 
 - **API key:** `api_key` reads `BROWSERBUNNY_API_KEY` when omitted. An explicit key
   takes priority over the environment variable.
-- **Timeout:** `timeout` sets the HTTP request timeout in seconds.
 
 </Tab>
 <Tab title="JavaScript">
 
-Set the base URL explicitly and pass an abort signal for a 30-second timeout:
+List the available devices:
 
 ```javascript
 const baseUrl = "https://api.browserbunny.dev";
 const response = await fetch(`${baseUrl}/v1/devices`, {
-  headers: { Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}` },
-  signal: AbortSignal.timeout(30_000)
+  headers: { Authorization: `Bearer ${process.env.BROWSERBUNNY_API_KEY}` }
 });
 const catalog = await response.json();
 if (!response.ok) throw new Error(JSON.stringify(catalog));
