@@ -3,30 +3,14 @@ title: "Errors, retries, and limits"
 description: "Handle submission errors and retry without creating duplicate tests."
 ---
 
-## Retry a submission
+## If a submission is interrupted
 
-Use `Idempotency-Key` on `POST /v1/tests` when a submission may need to be retried.
+A lost response does not mean the test failed to start. Check
+[your recent tests](/api-reference/list-tests) before submitting again.
+If the test exists, retain its ID and follow its status. Another create request
+can start another test.
 
-### Key requirements
-
-- **Length:** 8–128 characters.
-- **Characters:** letters, numbers, periods, underscores, colons, or hyphens.
-- **Uncertain response:** retry with the original key and request body.
-- **New test:** use a new key.
-
-### Submission responses
-
-| Request | Response |
-| --- | --- |
-| New submission | HTTP `202` |
-| Same key and request | HTTP `200` with the existing test; no new execution |
-| Same key with changed input | HTTP `409` |
-
-The replay comparison includes the starting URL, trimmed instructions, resolved
-devices and project.
-
-**Release versions can change.** Separate tests can use different installed
-versions as AWS updates its browsers. Compare `actual_environment` when reviewing results.
+You can retry requests that read tests, logs, reports, and network activity.
 
 ## Handle request errors
 
@@ -60,11 +44,11 @@ Application-generated errors have this structure:
 | `402` | Minutes or billing readiness required. Review account minutes and the error message. |
 | `403` | Permission or origin rejected. Check credentials and request origin. |
 | `404` | Test or execution is inaccessible. Check the IDs and project key. |
-| `409` | Idempotency conflict or minutes pending settlement. Restore original inputs or wait for settlement. |
+| `409` | The request conflicts with the current state, or minutes are pending settlement. Read the error message before trying again. |
 | `422` | Invalid input. Correct the indicated field, URL, device name, or query. |
 | `429` | AWS account or service throttling. Honor `Retry-After` when returned and back off. |
-| `500` | Unexpected service error. Retain `request_id` and the submission key before retrying. |
-| `503` | Backing service unavailable. Retry reads; retain the original key for submission retries. |
+| `500` | Unexpected service error. Retain `request_id`; check recent tests before resubmitting. |
+| `503` | Backing service unavailable. Retry reads; check recent tests before resubmitting. |
 
 ### Gateway errors
 

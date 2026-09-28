@@ -2041,7 +2041,7 @@
     }
   },
   "info": {
-    "description": "Natural-language browser tests with explicit environments and verified results.",
+    "description": "Natural-language browser tests on selected devices with verified results.",
     "title": "BrowserBunny API",
     "version": "1.0.0"
   },
@@ -2224,7 +2224,7 @@
         ],
         "summary": "List devices",
         "tags": [
-          "Tests"
+          "Devices"
         ]
       }
     },
@@ -2441,29 +2441,6 @@
       },
       "post": {
         "operationId": "createTest",
-        "parameters": [
-          {
-            "description": "Reuse this key and request body to retry a submission safely.",
-            "in": "header",
-            "name": "idempotency-key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "maxLength": 128,
-                  "minLength": 8,
-                  "pattern": "^[A-Za-z0-9_.:-]+$",
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Reuse this key and request body to retry a submission safely.",
-              "title": "Idempotency-Key"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2483,7 +2460,7 @@
                 }
               }
             },
-            "description": "Idempotent replay",
+            "description": "Existing test",
             "headers": {
               "Location": {
                 "description": "URL of the accepted test.",
@@ -2617,7 +2594,7 @@
                 }
               }
             },
-            "description": "Idempotency conflict or minutes pending settlement.",
+            "description": "Request conflicts with the current state or minutes are pending settlement.",
             "headers": {
               "X-Request-ID": {
                 "description": "Application request identifier for support, when provided.",

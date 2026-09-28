@@ -8,6 +8,7 @@ is this repository; `main` publishes to https://browserbunny.dev/docs.
   Describe only the supported API; do not add compatibility aliases or old fields.
 - `devices` is a list of supported names from GET /v1/devices; each uses the latest AWS browser release.
 - Upload URLs and supported conditions belong in instructions.
+- Request deduplication keys are internal SDK transport details, not public setup steps or API-reference parameters.
 - The SDK sends the same selectors as HTTP. Describe one test with
   one execution per environment, and one status field for both progress and result.
 - The backend owns OpenAPI. Regenerate `openapi/public-v1.json` using

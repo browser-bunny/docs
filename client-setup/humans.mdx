@@ -118,7 +118,7 @@ console.log(catalog);
 ### Request and execution behavior
 
 - **Closed connection:** remote work continues.
-- **Uncertain submission:** retry with the original idempotency key.
+- **Uncertain submission:** check your recent tests before submitting again.
 - **HTTP error:** the API request failed.
 - **Execution error:** an accepted test could not complete preparation or execution.
 
@@ -130,7 +130,7 @@ See [results](/results) for status and cancellation, and
 
 - **HTTP errors:** use `--fail-with-body` and inspect the returned JSON.
 - **Polling:** request `GET /v1/tests/TEST_ID` about every two seconds until terminal.
-- **Retries:** keep the same `Idempotency-Key` for an uncertain create request.
+- **Retries:** check your recent tests after an uncertain create request.
 
 </Tab>
 <Tab title="Python">
@@ -157,7 +157,7 @@ with BrowserBunny() as client:
 
 **Submission retries**
 
-- Each create call generates a fresh request key.
+- Each create call submits a new test.
 - After an uncertain submission, inspect `tests.list()` before submitting again.
 - POST requests are never retried automatically.
 
@@ -226,7 +226,7 @@ Call these methods on a `BrowserBunny` client:
 - **HTTP failures:** `fetch` still resolves; check `response.ok` before using the result.
 - **Transport failures:** a rejected fetch or expired abort signal can leave the
   submission's remote result unknown.
-- **Retries:** retain the original idempotency key.
+- **Retries:** check your recent tests before submitting again.
 - **Polling:** request `GET /v1/tests/TEST_ID` about every two seconds until a
   [terminal status](/results#terminal-statuses).
 

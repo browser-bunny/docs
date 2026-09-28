@@ -37,7 +37,7 @@ curl --fail-with-body "https://api.browserbunny.dev/v1/tests" \
   --data '{
   "start_url": "https://example.com",
   "instructions": "Verify that the page heading is Example Domain.",
-    "devices": ["desktop-chrome"]
+  "devices": ["desktop-chrome"]
 }'
 ```
 
@@ -77,19 +77,15 @@ console.log(test);
 
 - **Accepted:** HTTP `202` means the test is ready for preparation.
 - **Test ID:** save the returned `id`, which starts with `test_`.
-- **Executions:** `executions` contains one entry per selected environment.
+- **Executions:** `executions` contains one entry per selected device.
 
 **Acceptance is asynchronous.** The browser work finishes later. Unsupported
 instructions can produce an execution error before a browser is allocated.
 
-### Retry safely
+### If the response is lost
 
-Keep the same `Idempotency-Key` and request body if the response is lost.
-
-| Retry | Response |
-| --- | --- |
-| Same key and input | HTTP `200` with the existing test |
-| Same key with changed input | HTTP `409` |
+Check [your recent tests](/api-reference/list-tests) before submitting again.
+Another create request can start another test.
 
 ## Follow the test
 
